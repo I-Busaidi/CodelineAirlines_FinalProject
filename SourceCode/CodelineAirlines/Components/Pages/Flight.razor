@@ -1,0 +1,53 @@
+﻿@page "/flights"
+@inject IFlightService flightService
+@inject NavigationManager NavManager
+@using MudBlazor
+
+<MudText Typo="Typo.h4" Class="mb-4">Flight List</MudText>
+
+<MudExpansionPanels>
+    @if (flights != null && flights.Any())
+    {
+        @foreach (var flight in flights)
+        {
+            <MudExpansionPanel Text="@($"{flight.SourceAirportName} → {flight.DestinationAirportName} on {flight.ScheduledDepartureDate}")">
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.subtitle1"><b>Flight Number:</b> @flight.FlightNo</MudText>
+                    <MudText Typo="Typo.subtitle1"><b>Origin:</b> @flight.SourceAirportName</MudText>
+                    <MudText Typo="Typo.subtitle1"><b>Destination:</b> @flight.DestinationAirportName</MudText>
+                    <MudText Typo="Typo.subtitle1"><b>Departure Time:</b> @flight.ScheduledDepartureDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
+                    <MudText Typo="Typo.subtitle1"><b>Arrival Time:</b> @flight.ScheduledArrivalDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
+                    <MudButton Variant="Variant.Filled"
+                               DropShadow="false"
+                               Color="Color.Primary"
+                               OnClick="() => NavigateToBooking(flight.FlightNo.ToString())">
+                        BOOK NOW
+                    </MudButton>
+                </MudPaper>
+            </MudExpansionPanel>
+        }
+    }
+    else
+    {
+        <MudExpansionPanel Text="No flights available">
+            <MudText Color="Color.Secondary" Typo="Typo.body2">No flights available</MudText>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+@code {
+    protected override void OnInitialized()
+    {
+        GetFlights();
+    }
+    private List<FlightOutputDTO> flights { get; set; }
+    private void GetFlights()
+    {
+        flights = flightService.GetAllFlights();
+    }
+
+    private void NavigateToBooking(string flightNo)
+    {
+        NavManager.NavigateTo($"/book-flight/{flightNo}");
+    }
+}
