@@ -1,0 +1,114 @@
+﻿@page "/book-flight"
+@page "/book-flight/{FlightNo}"
+@inject NavigationManager NavManager
+@using MudBlazor
+
+<MudText Typo="Typo.h4" Class="mb-4">Book Flight @FlightNo</MudText>
+
+<MudPaper Class="pa-4" Elevation="3">
+    <MudForm @ref="form" OnValidSubmit="AddPassenger">
+        <MudText Typo="Typo.h5" Class="mb-4">Passenger Information</MudText>
+
+        <!-- Passenger Name -->
+        <MudTextField Label="Passenger Name" @bind-Value="currentPassenger.PassengerName" Required="true" />
+
+        <!-- Passport Number -->
+        <MudTextField Label="Passport Number" @bind-Value="currentPassenger.Passport" Required="true" />
+
+        <!-- Gender -->
+        <MudSelect T="string" Label="Gender" @bind-Value="currentPassenger.Gender" Required="true">
+            <MudSelectItem Value="@gender[0]">Male</MudSelectItem>
+            <MudSelectItem Value="@gender[1]">Female</MudSelectItem>
+        </MudSelect>
+
+        <!-- Birth Date -->
+        <MudDatePicker Label="Date of Birth" @bind-Date="currentPassenger.BirthDate" Required="true" />
+
+        <!-- Nationality -->
+        <MudTextField Label="Nationality" @bind-Value="currentPassenger.Nationality" Required="true" />
+
+        <MudText Typo="Typo.h6" Class="mt-4">Selected Flight: @FlightNo</MudText>
+
+        <!-- Buttons -->
+        <MudItem xs="12" Class="d-flex justify-center mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" Type="Submit">Add Passenger</MudButton>
+            <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Tertiary">CHOOSE YOUR SEAT</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack">Cancel</MudButton>
+        </MudItem>
+    </MudForm>
+</MudPaper>
+
+<MudText Typo="Typo.h5" Class="my-4">Passenger List</MudText>
+@if (passengerList.Count > 0)
+{
+    <MudTable Items="passengerList" Dense="true" Hover="true">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Passport</MudTh>
+            <MudTh>Gender</MudTh>
+            <MudTh>Birth Date</MudTh>
+            <MudTh>Nationality</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.PassengerName</MudTd>
+            <MudTd>@context.Passport</MudTd>
+            <MudTd>@context.Gender</MudTd>
+            <MudTd>@context.BirthDate?.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd>@context.Nationality</MudTd>
+            <MudTd>
+                <MudButton Icon="Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemovePassenger(context))">Remove</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+else
+{
+    <MudText Typo="Typo.body1" Color="Color.Secondary">No passengers added yet.</MudText>
+}
+
+<MudSnackbarProvider />
+
+@code {
+    [Parameter]
+    public string FlightNo { get; set; }
+
+    public string[] gender = new string[2] { "Male", "Female" };
+    private MudForm form;
+    private PassengerInputDTO currentPassenger = new PassengerInputDTO();
+    private List<PassengerInputDTO> passengerList = new();
+
+    private void AddPassenger()
+    {
+        passengerList.Add(new PassengerInputDTO
+            {
+                PassengerName = currentPassenger.PassengerName,
+                Passport = currentPassenger.Passport,
+                Gender = currentPassenger.Gender,
+                BirthDate = currentPassenger.BirthDate,
+                Nationality = currentPassenger.Nationality
+            });
+
+        currentPassenger = new PassengerInputDTO(); // Clear the form
+    }
+
+    private void RemovePassenger(PassengerInputDTO passenger)
+    {
+        passengerList.Remove(passenger);
+    }
+
+    private void NavigateBack()
+    {
+        NavManager.NavigateTo("/flights");
+    }
+
+    public class PassengerInputDTO
+    {
+        public string PassengerName { get; set; }
+        public string Passport { get; set; }
+        public string Gender { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public string Nationality { get; set; }
+    }
+}
+
