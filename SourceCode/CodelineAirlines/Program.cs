@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using MudBlazor.Services;
 
 namespace CodelineAirlines
 {
@@ -76,7 +77,7 @@ namespace CodelineAirlines
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddHttpClient<WeatherService>(); // Used for weather forecast.
             //builder.Services.AddControllers();
-
+            builder.Services.AddMudServices();
             // Add JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"];
