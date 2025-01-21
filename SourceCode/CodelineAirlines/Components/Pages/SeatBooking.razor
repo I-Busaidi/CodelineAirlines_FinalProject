@@ -1,0 +1,180 @@
+﻿@page "/seatBooking"
+
+@inject IAirplaneSpecService airplaneSpecService
+@inject IMapper mapper
+
+<div class="seat-layout">
+    @foreach (var seatClass in seatLayoutByClass)
+    {
+        <div class="seat-class">
+            <h3>@seatClass.Key</h3> <!-- First Class, Business, Economy -->
+
+            @foreach (var row in seatClass.Value)
+            {
+                <div class="seat-row">
+                    @foreach (var seat in row)
+                    {
+                        var seatClassName = $"seat-icon {GetSeatClass(seat.SeatLocation)}";
+
+                        @if (seat.SeatLocation == -1)
+                        {
+                            <div class="aisle"></div>
+                        }
+                        else
+                        {
+                            <MudToggleIconButton Toggled="@GetSeatStatus(seat.SeatNumber)"
+                                                 ToggledChanged="@(value => UpdateSeatStatus(seat.SeatNumber, value))"
+                                                 Icon="@Icons.Material.Filled.EventSeat"
+                                                 Color="Color.Default"
+                                                 ToggledIcon="@Icons.Material.Filled.EventSeat"
+                                                 ToggledColor="Color.Success"
+                                                 Disabled="false"
+                                                 Class="@seatClassName" />
+                        }
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private Airplane airplane { get; set; } = new Airplane
+    {
+        AirplaneId = 1,
+        AirplaneModel = "Boeing 707",
+        ManufactureDate = DateOnly.MinValue,
+        CurrentAirportId = 1,
+        IsActive = true
+    };
+
+    private AirplaneSpecs airplaneSpecs { get; set; }
+    private List<SeatTemplate> seats = new List<SeatTemplate>();
+    private List<(SeatTemplate seat, bool status)> seatStatuses = new List<(SeatTemplate seat, bool status)>();
+    private Dictionary<string, List<List<SeatTemplate>>> seatLayoutByClass = new();
+
+    protected override void OnInitialized()
+    {
+        airplaneSpecs = airplaneSpecService.GetSpecsByModelWithRelatedData(airplane.AirplaneModel);
+
+        if (airplaneSpecs?.Seats != null)
+        {
+            seats = airplaneSpecs.Seats.ToList();
+
+            // Initialize seatStatuses
+            foreach (var seat in seats)
+            {
+                seatStatuses.Add((seat, false));
+            }
+
+            // Group seats by type (First Class, Business, Economy)
+            var seatsByClass = seats.GroupBy(s => s.Type);
+
+            // Organize layout for each class
+            foreach (var seatClass in seatsByClass)
+            {
+                var classLayout = new List<List<SeatTemplate>>();
+
+                // Group seats into rows based on SeatNumber
+                var rows = seatClass.GroupBy(s => int.Parse(new string(s.SeatNumber.TakeWhile(char.IsDigit).ToArray())));
+
+                foreach (var row in rows)
+                {
+                    var rowSeats = new List<SeatTemplate>();
+
+                    // Insert aisle placeholders if necessary
+                    foreach (var seat in row.OrderBy(s => s.SeatNumber))
+                    {
+                        if (seat.SeatLocation == -1) // Aisle seat
+                        {
+                            rowSeats.Add(new SeatTemplate { SeatLocation = -1 }); // Add aisle placeholder
+                        }
+                        rowSeats.Add(seat); // Add actual seat
+                    }
+
+                    classLayout.Add(rowSeats);
+                }
+
+                seatLayoutByClass[seatClass.Key] = classLayout;
+            }
+
+            Console.WriteLine($"Initialized seat layout for {seatLayoutByClass.Count} classes.");
+        }
+    }
+
+    private void UpdateSeatStatus(string seatNumber, bool status)
+    {
+        var seatIndex = seatStatuses.FindIndex(s => s.seat.SeatNumber == seatNumber);
+        if (seatIndex >= 0)
+        {
+            var seatStatus = seatStatuses[seatIndex];
+            seatStatuses[seatIndex] = (seatStatus.seat, status);
+            Console.WriteLine($"Seat {seatNumber} toggled to {status}");
+        }
+    }
+
+    private bool GetSeatStatus(string seatNumber)
+    {
+        var seat = seatStatuses.FirstOrDefault(s => s.seat.SeatNumber == seatNumber);
+        return seat != default ? seat.status : false;
+    }
+
+    private string GetSeatClass(int seatLocation)
+    {
+        return seatLocation switch
+        {
+            0 => "window-seat",
+            1 => "aisle-seat",
+            2 => "middle-seat",
+            _ => "unknown-seat"
+        };
+    }
+}
+
+
+<style>
+    .seat-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin: 20px auto;
+        width: fit-content;
+    }
+
+    .seat-class {
+        margin-bottom: 30px;
+    }
+
+    .seat-row {
+        display: flex;
+        gap: 5px;
+    }
+
+    .seat-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #ccc;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .window-seat {
+        background-color: #a8dadc;
+    }
+
+    .aisle-seat {
+        background-color: #f4a261;
+    }
+
+    .middle-seat {
+        background-color: #e9c46a;
+    }
+
+    .aisle {
+        width: 20px;
+        background-color: transparent;
+    }
+</style>
