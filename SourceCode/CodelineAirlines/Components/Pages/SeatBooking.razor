@@ -6,16 +6,18 @@
 @inject SeatSelectionService SeatSelectionService
 
 <MudDrawerContainer>
-    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" Variant="@DrawerVariant.Mini" OverlayAutoClose="false">
+    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" OverlayAutoClose="false" Class="fixed-drawer" Style="height:90%; width:20%">
         <MudDrawerHeader>
-        <MudText Typo="Typo.h6">Selected Seats</MudText>
-    </MudDrawerHeader>
-        <MudCard>
+            <MudText Typo="Typo.h6">Selected Seats</MudText>
+        </MudDrawerHeader>
+        <MudCard Class="drawerCard">
             <MudCardContent>
                 <MudList T="string">
                     @foreach (var seat in selectedSeats)
                     {
-                        <MudListItem Text="@seat.SeatNumber" Icon="@Icons.Material.Filled.EventSeat" />
+                        var seatDTO = mapper.Map<SeatsOutputDTO>(seat);
+                        string text = $"{seatDTO.SeatNumber} | {seatDTO.Type} | {seatDTO.SeatLocation}";
+                        <MudListItem Text="@text" Icon="@Icons.Material.Filled.EventSeat" />
                         <MudDivider />
                     }
                 </MudList>
@@ -26,13 +28,15 @@
             </MudCardActions>
         </MudCard>
     </MudDrawer>
-    <MudMainContent>
+    <MudMainContent Style="background-color: rgba(255, 255, 255, 0.1) ; border-radius: 10px; margin-right: 400px; backdrop-filter:blur(10px); color:black; padding: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); overflow-y: auto; height:855px">
+        
         <div class="seat-layout">
+            <MudText Typo="Typo.h4">Select Seats</MudText>
+            <MudDivider />
             @foreach (var seatClass in seatLayoutByClass)
             {
                 <div class="seat-class">
-                    <h3>@seatClass.Key</h3>
-
+                    <MudText Typo="Typo.h6" Style="text-align:center">@seatClass.Key</MudText>
                     @foreach (var row in seatClass.Value)
                     {
                         <div class="seat-row">
@@ -51,7 +55,7 @@
                                                          Icon="@Icons.Material.Filled.EventSeat"
                                                          Color="Color.Default"
                                                          ToggledIcon="@Icons.Material.Filled.EventSeat"
-                                                         ToggledColor="Color.Success"
+                                                         ToggledColor="Color.Warning"
                                                          Disabled="false"
                                                          Class="@seatClassName" />
                                 }
@@ -59,6 +63,7 @@
                         </div>
                     }
                 </div>
+                <MudDivider />
             }
         </div>
     </MudMainContent>
@@ -88,7 +93,7 @@
 
         if (airplaneSpecs?.Seats != null)
         {
-            seats = airplaneSpecs.Seats.ToList();
+            seats = airplaneSpecs.Seats.OrderBy(s => int.Parse(new string(s.SeatNumber.TakeWhile(char.IsDigit).ToArray()))).ToList();
 
             // Initialize seatStatuses
             foreach (var seat in seats)
@@ -126,7 +131,6 @@
 
                     classLayout.Add(rowSeats);
                 }
-
                 seatLayoutByClass[seatClass.Key] = classLayout;
             }
 
@@ -188,12 +192,44 @@
 
 
 <style>
+    body {
+        background: linear-gradient(rgba(0, 51, 104, 0.1), rgba(0, 51, 104, 0.1)), url('/images/background.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+    }
     .seat-layout {
         display: flex;
         flex-direction: column;
         gap: 20px;
         margin: 20px auto;
-        width: fit-content;
+        width: 700px;
+        padding: 50px;
+        border-left: double;
+        border-right: double;
+        border-color: white;
+        border-radius: 10px;
+
+    }
+
+    .drawerCard{
+        flex-grow: 1; /* Fills remaining space after actions */
+        overflow-y: auto; /* Enables scrolling if content exceeds height */
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .fixed-drawer {
+        position: fixed !important;/* Keeps the drawer fixed */
+        top: 75px; /* Offset to allow space for a header/navbar */
+        margin-right: 25px; /* Adds spacing from the right edge */
+       
+        z-index: 1050; /* Keeps it above other elements */
+        overflow-y: auto; /* Allows scrolling for content overflow */
+        border-radius: 10px; /* Smooth rounded corners */
+        backdrop-filter: blur(5px);
+        background-color:transparent; /* Match MudBlazor theme */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Adds subtle shadow */
+        padding: 10px; /* Adds inner spacing for better content display */
     }
 
     .seat-class {
@@ -202,8 +238,9 @@
 
     .seat-row {
         display: flex;
-        justify-content: center; /* Center-align seats */
+        justify-content: space-evenly; /* Center-align seats */
         gap: 10px; /* Space between groups of seats and aisles */
+        margin-bottom: 1px;
     }
 
     .seat-icon {
@@ -215,22 +252,23 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        color: white;
     }
 
     .window-seat {
-        background-color: #a8dadc;
+        background-color: #3949AB;
     }
 
     .aisle-seat {
-        background-color: #f4a261;
+        background-color: #303F9F;
     }
 
     .middle-seat {
-        background-color: #e9c46a;
+        background-color: #1A237E;
     }
 
     .aisle {
         width: 20px;
-        background-color: transparent;
+        background-color: rgba(229, 95, 96, 0.3);
     }
 </style>
