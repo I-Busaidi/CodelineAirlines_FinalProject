@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Services\" />
     <Folder Include="wwwroot\Images\" />
   </ItemGroup>
