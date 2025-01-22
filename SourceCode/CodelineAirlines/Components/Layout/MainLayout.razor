@@ -1,13 +1,42 @@
 ﻿@inherits LayoutComponentBase
 
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+<head>
+    <title>Codeline Air - Your Airline</title>
+</head>
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <main>
+
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <div class= style="display: flex; align-items: center; position: absolute; top: 10px; left: 10px;">
+                <img src="Logo.jpg" style="height: 40px; margin-right: 10px; color:lightgray">
+                <span style="color: light lightgray; font-size: 1.5rem; font-weight: bold;">Codeline Air</span>
+            </div>
+
+         
+            
+            <NavLink class="nav-link" href="sign in">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> sign in
+            </NavLink>
+
+
+            
+          
+          
         </div>
 
         <article class="content px-4">
