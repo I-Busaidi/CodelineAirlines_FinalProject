@@ -1,44 +1,73 @@
 ﻿@page "/seatBooking"
 
+@inject NavigationManager NavigationManager
 @inject IAirplaneSpecService airplaneSpecService
 @inject IMapper mapper
+@inject SeatSelectionService SeatSelectionService
 
-<div class="seat-layout">
-    @foreach (var seatClass in seatLayoutByClass)
-    {
-        <div class="seat-class">
-            <h3>@seatClass.Key</h3> <!-- First Class, Business, Economy -->
-
-            @foreach (var row in seatClass.Value)
-            {
-                <div class="seat-row">
-                    @foreach (var seat in row)
+<MudDrawerContainer>
+    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" Variant="@DrawerVariant.Mini" OverlayAutoClose="false">
+        <MudDrawerHeader>
+        <MudText Typo="Typo.h6">Selected Seats</MudText>
+    </MudDrawerHeader>
+        <MudCard>
+            <MudCardContent>
+                <MudList T="string">
+                    @foreach (var seat in selectedSeats)
                     {
-                        var seatClassName = $"seat-icon {GetSeatClass(seat.SeatLocation)}";
+                        <MudListItem Text="@seat.SeatNumber" Icon="@Icons.Material.Filled.EventSeat" />
+                        <MudDivider />
+                    }
+                </MudList>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Color="Color.Primary" OnClick="@ConfirmSeats">Confirm</MudButton>
+                <MudButton Color="Color.Secondary" OnClick="@GoBack">Return</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudDrawer>
+    <MudMainContent>
+        <div class="seat-layout">
+            @foreach (var seatClass in seatLayoutByClass)
+            {
+                <div class="seat-class">
+                    <h3>@seatClass.Key</h3>
 
-                        @if (seat.SeatLocation == -1)
-                        {
-                            <div class="aisle"></div>
-                        }
-                        else
-                        {
-                            <MudToggleIconButton Toggled="@GetSeatStatus(seat.SeatNumber)"
-                                                 ToggledChanged="@(value => UpdateSeatStatus(seat.SeatNumber, value))"
-                                                 Icon="@Icons.Material.Filled.EventSeat"
-                                                 Color="Color.Default"
-                                                 ToggledIcon="@Icons.Material.Filled.EventSeat"
-                                                 ToggledColor="Color.Success"
-                                                 Disabled="false"
-                                                 Class="@seatClassName" />
-                        }
+                    @foreach (var row in seatClass.Value)
+                    {
+                        <div class="seat-row">
+                            @foreach (var seat in row)
+                            {
+                                var seatClassName = $"seat-icon {GetSeatClass(seat.SeatLocation)}";
+
+                                @if (seat.SeatLocation == -1)
+                                {
+                                    <div class="aisle"></div>
+                                }
+                                else
+                                {
+                                    <MudToggleIconButton Toggled="@GetSeatStatus(seat.SeatNumber)"
+                                                         ToggledChanged="@(value => UpdateSeatStatus(seat, value))"
+                                                         Icon="@Icons.Material.Filled.EventSeat"
+                                                         Color="Color.Default"
+                                                         ToggledIcon="@Icons.Material.Filled.EventSeat"
+                                                         ToggledColor="Color.Success"
+                                                         Disabled="false"
+                                                         Class="@seatClassName" />
+                                }
+                            }
+                        </div>
                     }
                 </div>
             }
         </div>
-    }
-</div>
+    </MudMainContent>
+</MudDrawerContainer>
 
 @code {
+    private bool drawerOpen = true; // Controls drawer visibility
+    private List<SeatTemplate> selectedSeats = new(); // Stores selected seats
+
     private Airplane airplane { get; set; } = new Airplane
     {
         AirplaneId = 1,
@@ -67,8 +96,9 @@
                 seatStatuses.Add((seat, false));
             }
 
-            // Group seats by type (First Class, Business, Economy)
-            var seatsByClass = seats.GroupBy(s => s.Type);
+            // Group seats by type (First Class, Business, Economy) and sort order
+            var seatsByClass = seats.GroupBy(s => s.Type)
+                                    .OrderBy(s => GetClassPriority(s.Key));
 
             // Organize layout for each class
             foreach (var seatClass in seatsByClass)
@@ -81,15 +111,17 @@
                 foreach (var row in rows)
                 {
                     var rowSeats = new List<SeatTemplate>();
-
-                    // Insert aisle placeholders if necessary
+                    int lastSeatLocation = -1;
                     foreach (var seat in row.OrderBy(s => s.SeatNumber))
                     {
-                        if (seat.SeatLocation == -1) // Aisle seat
+                        // Add an aisle if there's a gap between seat locations
+                        if (lastSeatLocation == 1 && seat.SeatLocation == 1)
                         {
-                            rowSeats.Add(new SeatTemplate { SeatLocation = -1 }); // Add aisle placeholder
+                            rowSeats.Add(new SeatTemplate { SeatLocation = -1 });
                         }
-                        rowSeats.Add(seat); // Add actual seat
+
+                        rowSeats.Add(seat);
+                        lastSeatLocation = seat.SeatLocation;
                     }
 
                     classLayout.Add(rowSeats);
@@ -102,21 +134,44 @@
         }
     }
 
-    private void UpdateSeatStatus(string seatNumber, bool status)
+    private int GetClassPriority(string seatClass)
     {
-        var seatIndex = seatStatuses.FindIndex(s => s.seat.SeatNumber == seatNumber);
-        if (seatIndex >= 0)
+        return seatClass switch
         {
-            var seatStatus = seatStatuses[seatIndex];
-            seatStatuses[seatIndex] = (seatStatus.seat, status);
-            Console.WriteLine($"Seat {seatNumber} toggled to {status}");
+            "First Class" => 1,
+            "Business" => 2,
+            "Economy" => 3,
+            _ => 4
+        };
+    }
+
+    private void UpdateSeatStatus(SeatTemplate seat, bool status)
+    {
+        if (status)
+        {
+            selectedSeats.Add(seat);
         }
+        else
+        {
+            selectedSeats.RemoveAll(s => s.SeatNumber == seat.SeatNumber);
+        }
+        drawerOpen = true; // Open drawer when seats are selected
     }
 
     private bool GetSeatStatus(string seatNumber)
     {
-        var seat = seatStatuses.FirstOrDefault(s => s.seat.SeatNumber == seatNumber);
-        return seat != default ? seat.status : false;
+        return selectedSeats.Any(s => s.SeatNumber == seatNumber);
+    }
+
+    private void ConfirmSeats()
+    {
+        SeatSelectionService.SetSelectedSeats(selectedSeats);
+        NavigationManager.NavigateTo("/nextpage");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/previouspage");
     }
 
     private string GetSeatClass(int seatLocation)
@@ -147,7 +202,8 @@
 
     .seat-row {
         display: flex;
-        gap: 5px;
+        justify-content: center; /* Center-align seats */
+        gap: 10px; /* Space between groups of seats and aisles */
     }
 
     .seat-icon {

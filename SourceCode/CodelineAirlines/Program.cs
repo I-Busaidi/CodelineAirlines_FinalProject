@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using MudBlazor.Services;
+using CodelineAirlines.Helpers;
 
 namespace CodelineAirlines
 {
@@ -77,7 +78,7 @@ namespace CodelineAirlines
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddHttpClient<WeatherService>(); // Used for weather forecast.
             //builder.Services.AddControllers();
-
+            builder.Services.AddScoped<SeatSelectionService>();
             builder.Services.AddMudServices();
 
             // Add JWT Authentication
