@@ -1,0 +1,63 @@
+﻿@page "/"
+@layout Layout.MainLayout
+
+
+
+<div class="page-container">
+    <MudDataGrid T="User" Items="@users" ReadOnly="@_readOnly" EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
+                 Bordered="true" Dense="true" EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
+        <Columns>
+            <!-- Email Column -->
+            <PropertyColumn Property="x => x.Email" Title="Email" />
+
+            <!-- Name Column -->
+            <PropertyColumn Property="x => x.Name" Title="Name" />
+
+            <!-- Edit Button Column -->
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+
+</div>
+
+@code {
+    private IEnumerable<User> users = new List<User>
+    {
+        new User { Name = "Marcella Wallace", Email = "admin@demo.com" },
+        new User { Name = "John Smith", Email = "john@demo.com" },
+        new User { Name = "Mandy Moore", Email = "mandy@demo.com" }
+    };
+
+    private bool _readOnly; // Determines if the grid is in read-only mode
+    private bool _isCellEditMode; // Determines if the grid uses Cell or Form edit mode
+    private bool _editTriggerRowClick; // Determines if editing is triggered manually or by row click
+
+    // User Model
+    public class User
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
+}
+
+<style>
+    .page-container {
+        display: flex;
+        justify-content: center; /* Centers horizontally */
+        align-items: center; /* Centers vertically */
+        height: 100vh; /* Takes the full viewport height */
+        flex-direction: column; /* Ensures elements are stacked vertically */
+        text-align: center; /* Optional: Center-aligns text */
+        background-color:lightgray; /* Optional: Adds a light background color */
+    }
+
+    .MudDataGrid {
+        width: 200; /* Adjusts the table width */
+        max-width: 800px; /* Optional: Prevents the table from growing too large */
+    }
+
+</style>
