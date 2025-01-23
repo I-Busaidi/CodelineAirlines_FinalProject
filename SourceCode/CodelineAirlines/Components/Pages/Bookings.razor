@@ -1,0 +1,81 @@
+﻿@page "/bookings"
+@inject NavigationManager NavManager
+@inject IBookingService BookingService
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-6">
+    <MudText Typo="Typo.h4" Class="mb-6 text-center">Your Bookings</MudText>
+
+    @if (bookings?.Count > 0)
+    {
+        <MudExpansionPanels>
+            @foreach (var booking in bookings)
+            {
+                <MudExpansionPanel Text="@($"Flight: {booking.Flight.SourceAirport} → {booking.Flight.DestinationAirport} - Date: {booking.Flight.ScheduledDepartureDate:dd/MM/yyyy}")">
+                    <MudPaper Class="pa-4">
+                        <MudGrid>
+                            <MudItem xs="8">
+                                <MudText Typo="Typo.subtitle1"><b>Passenger:</b> @booking.Passenger.PassengerName</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Class:</b> @booking.Class</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Seat No:</b> @booking.SeatNo</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Total Cost:</b> @booking.TotalCost OMR</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Meal:</b> @booking.Meal</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Status:</b> @GetBookingStatus(booking.Status)</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Booking Date:</b> @booking.BookingDate.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                            </MudItem>
+                            <MudItem xs="4" Class="text-right">
+                                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => DeleteBooking(booking.BookingId)">
+                                    Delete Booking
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudExpansionPanel>
+            }
+        </MudExpansionPanels>
+    }
+    else
+    {
+        <MudText Typo="Typo.h6" Color="Color.Secondary" Class="text-center">No bookings found.</MudText>
+    }
+</MudContainer>
+
+@code {
+    private List<Booking> bookings;
+
+    protected override void OnInitialized()
+    {
+        // Fetch bookings for the logged-in user
+        bookings = BookingService.GetBookingsForPassenger("123123").ToList(); // Replace "123123" with the actual user ID
+    }
+
+    private string GetBookingStatus(int status)
+    {
+        return status switch
+        {
+            0 => "Pending",
+            1 => "Confirmed",
+            2 => "Cancelled",
+            _ => "Unknown"
+        };
+    }
+
+    private void DeleteBooking(int bookingId)
+    {
+        try
+        {
+            // Call the service to delete the booking
+             BookingService.CancelBooking(bookingId);
+
+            // Optionally refresh the bookings list
+            bookings = BookingService.GetBookingsForPassenger("123123").ToList();
+
+            // Navigate back to the flights page
+            NavManager.NavigateTo("/flights");
+        }
+        catch (Exception ex)
+        {
+            // Handle any errors (e.g., log or display an error message)
+            Console.WriteLine($"Error deleting booking: {ex.Message}");
+        }
+    }
+}

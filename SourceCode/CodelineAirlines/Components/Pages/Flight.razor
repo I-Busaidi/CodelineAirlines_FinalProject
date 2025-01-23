@@ -10,20 +10,29 @@
     {
         @foreach (var flight in flights)
         {
-            <MudExpansionPanel Text="@($"{flight.SourceAirportName} → {flight.DestinationAirportName} on {flight.ScheduledDepartureDate}")">
+            <MudExpansionPanel Text="@($"{flight.SourceAirportName} → {flight.DestinationAirportName} on {flight.ScheduledDepartureDate} ~ Price: {flight.Cost} OMR")">
+               
                 <MudPaper Class="pa-4">
-                    <MudText Typo="Typo.subtitle1"><b>Flight Number:</b> @flight.FlightNo</MudText>
-                    <MudText Typo="Typo.subtitle1"><b>Origin:</b> @flight.SourceAirportName</MudText>
-                    <MudText Typo="Typo.subtitle1"><b>Destination:</b> @flight.DestinationAirportName</MudText>
-                    <MudText Typo="Typo.subtitle1"><b>Departure Time:</b> @flight.ScheduledDepartureDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
-                    <MudText Typo="Typo.subtitle1"><b>Arrival Time:</b> @flight.ScheduledArrivalDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
-                    <MudButton Variant="Variant.Filled"
-                               DropShadow="false"
-                               Color="Color.Primary"
-                               OnClick="() => NavigateToBooking(flight.FlightNo.ToString())">
-                        BOOK NOW
-                    </MudButton>
+                    <MudGrid>
+                        <MudItem xs="8">
+                            <MudText Typo="Typo.subtitle1"><b>Flight Number:</b> @flight.FlightNo</MudText>
+                            <MudText Typo="Typo.subtitle1"><b>Origin:</b> @flight.SourceAirportName</MudText>
+                            <MudText Typo="Typo.subtitle1"><b>Destination:</b> @flight.DestinationAirportName</MudText>
+                            <MudText Typo="Typo.subtitle1"><b>Departure Time:</b> @flight.ScheduledDepartureDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
+                            <MudText Typo="Typo.subtitle1"><b>Arrival Time:</b> @flight.ScheduledArrivalDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
+                        </MudItem>
+                        <MudItem xs="4" Class="text-right">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2"><b>Price:</b> @flight.Cost OMR</MudText>
+                            <MudButton Variant="Variant.Filled"
+                                       DropShadow="false"
+                                       Color="Color.Primary"
+                                       OnClick="() => NavigateToBooking(flight.FlightNo.ToString())">
+                                BOOK NOW
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
                 </MudPaper>
+
             </MudExpansionPanel>
         }
     }
