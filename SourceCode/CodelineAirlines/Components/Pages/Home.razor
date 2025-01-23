@@ -149,16 +149,16 @@
     private bool _autoClose;
 }
 @code {
-    private bool IsDatePickerOpen = false; // To manage the visibility of the date picker
-    private DateTime? TravelDate = DateTime.Today; // Bound to the selected travel date
+    private bool IsDatePickerOpen = false; 
+    private DateTime? TravelDate = DateTime.Today; 
     private string TravelDateText => TravelDate?.ToShortDateString() ?? "Select your travel date";
     private void ToggleDatePicker()
     {
-        IsDatePickerOpen = !IsDatePickerOpen; // Toggle the visibility of the date picker
+        IsDatePickerOpen = !IsDatePickerOpen;
     }
-    private string FromLocation; // Bound to the "From" location field
-    private string ToLocation;   // Bound to the "Where To" location field
-    private decimal? Cost;       // Bound to the cost field
+    private string FromLocation; 
+    private string ToLocation;   
+    private decimal? Cost;       
     private async Task<IEnumerable<string>> SearchFromLocations(string value, CancellationToken token)
     {
         var locations = new List<string>
@@ -198,81 +198,77 @@
 <style>
     .carousel-image {
         width: 100%;
-        height: 400px; /* Matches carousel height */
-        object-fit: cover; /* Ensures no image distortion */
+        height: 400px; 
+        object-fit: cover; 
     }
 
-   /*  .card-container {
-        margin: 0 auto;
-        padding: 16px;
-        display: flex;
-        justify-content: space-around; /* Evenly spaces the cards */
-        flex-wrap: wrap; /* Ensures responsiveness */
+  
+        flex-wrap: wrap; 
     }
 
     .card-item {
-        width: 250px; /* Fixes card width */
-        margin: 16px; /* Adds spacing between cards */
+        width: 250px; 
+        margin: 16px; 
     }
 
     .card-image {
         height: 150px;
         object-fit: cover;
-        border-radius: 4px; /* Optional for rounded corners */
+        border-radius: 4px; 
     } */
 
 
 
     .search-section {
-        margin: 16px 0; /* Adds spacing between search section and carousel */
+        margin: 16px 0; 
     }
 
     .carousel-container {
-        margin-bottom: 50px; /* Adds space below the carousel */
+        margin-bottom: 50px; 
       
     }
 
    
 
     .trending-section {
-        margin-bottom: 24px; /* Adds space below the title and divider */
+        margin-bottom: 24px; 
     }
 
 
     .search-wrapper {
-        display: flex; /* Enables flexbox layout */
-        justify-content: center; /* Centers the search section horizontally */
-        margin-top: 50px; /* Adds space from the top of the page */
+        display: flex;
+        justify-content: center;
+        margin-top: 50px; 
     }
 
     .search-section {
-        width: 80%; /* Adjust the width of the search section */
-        max-width: 1200px; /* Prevent it from growing too large */
-        padding: 16px; /* Adds some padding */
-        background-color:lightgrey; /* Optional: Light background color */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Subtle shadow */
-        border-radius: 20px; /* Optional: Rounded corners */
+        width: 80%; 
+        max-width: 1200px;
+        padding: 16px; 
+        background-color:lightgrey; 
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+        border-radius: 20px; 
     }
-    /* Ensure cards are centered and in one horizontal line */
+  
     .card-container {
-        display: flex; /* Use flexbox to align items */
-        justify-content: center; /* Center the cards horizontally */
-        align-items: center; /* Center items vertically if needed */
-        flex-wrap: nowrap; /* Prevent wrapping to multiple lines */
-        margin: 20px auto; /* Center the container with some spacing */
-        max-width: 90%; /* Optional: Limit the width of the container */
-        gap: 20px; /* Space between cards */
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+        flex-wrap: nowrap; 
+        margin: 20px auto; 
+        max-width: 90%; 
+        gap: 20px; 
     }
 
     .card-item {
-        width: 250px; /* Fixed width for each card */
-        margin: 0; /* Reset margins */
+        width: 250px;
+        margin: 0; 
     }
 
     .card-image {
         height: 150px;
         object-fit: cover;
-        border-radius: 4px; /* Optional rounded corners */
+        border-radius: 4px; 
     }
 
 

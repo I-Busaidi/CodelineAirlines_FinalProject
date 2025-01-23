@@ -1,11 +1,15 @@
-﻿@page "/"
+﻿@page "/U"
 @layout Layout.MainLayout
-
-
+@inject IPassengerService PassengerService
+@inject NavigationManager NavManager
 
 <div class="page-container">
-    <MudDataGrid T="User" Items="@users" ReadOnly="@_readOnly" EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
-                 Bordered="true" Dense="true" EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
+
+    <!-- Users Table -->
+    <MudDataGrid T="User" Items="@users" ReadOnly="@_readOnly"
+                 EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
+                 Bordered="true" Dense="true"
+                 EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
         <Columns>
             <!-- Email Column -->
             <PropertyColumn Property="x => x.Email" Title="Email" />
@@ -22,19 +26,71 @@
         </Columns>
     </MudDataGrid>
 
+    <MudText Typo="Typo.h4" Class="mb-4">Passenger List</MudText>
+
+    <!-- Passenger List -->
+    <MudExpansionPanels>
+        @if (passengers != null && passengers.Any())
+        {
+            @foreach (var passenger in passengers)
+            {
+                <MudExpansionPanel Text="@($"{passenger.PassengerName} → {passenger.Nationality}")">
+                    <MudPaper Class="pa-4">
+                        <MudGrid>
+                            <MudItem xs="8">
+                                <MudText Typo="Typo.subtitle1"><b>Passenger Name:</b> @passenger.PassengerName</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Passport:</b> @passenger.Passport</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Gender:</b> @passenger.Gender</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Birth Date:</b> @passenger.BirthDate.ToString("dd/MM/yyyy")</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Nationality:</b> @passenger.Nationality</MudText>
+                                <MudText Typo="Typo.subtitle1"><b>Loyalty Points:</b> @passenger.LoyaltyPoints</MudText>
+                            </MudItem>
+                            <MudItem xs="4" Class="text-right">
+                                <MudButton Variant="Variant.Filled" DropShadow="false" Color="Color.Primary">
+                                    BOOK NOW
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudExpansionPanel>
+            }
+        }
+        else
+        {
+            <MudExpansionPanel Text="No passenger found">
+                <MudText Color="Color.Secondary" Typo="Typo.body2">No passengers available at the moment.</MudText>
+            </MudExpansionPanel>
+        }
+    </MudExpansionPanels>
 </div>
 
+
 @code {
+    // Users List
     private IEnumerable<User> users = new List<User>
     {
-        new User { Name = "Marcella Wallace", Email = "admin@demo.com" },
-        new User { Name = "John Smith", Email = "john@demo.com" },
-        new User { Name = "Mandy Moore", Email = "mandy@demo.com" }
+        new User { Name = "Marcella Wallace", Email = "admin@demo.com" }
     };
 
-    private bool _readOnly; // Determines if the grid is in read-only mode
-    private bool _isCellEditMode; // Determines if the grid uses Cell or Form edit mode
-    private bool _editTriggerRowClick; // Determines if editing is triggered manually or by row click
+    // Passenger List
+    private List<PassengerOutputDTO> passengers { get; set; } = new();
+
+    // Grid Settings
+    private bool _readOnly = false;
+    private bool _isCellEditMode = true;
+    private bool _editTriggerRowClick = true;
+
+    // Initialization
+    protected override void OnInitialized()
+    {
+        GetPassengerProfile();
+    }
+
+    private void GetPassengerProfile()
+    {
+        // Fetch passenger profile data using the service
+       // passengers = PassengerService.GetPassengerProfile(userId);
+    }
 
     // User Model
     public class User
@@ -44,20 +100,21 @@
     }
 }
 
+
 <style>
     .page-container {
         display: flex;
-        justify-content: center; /* Centers horizontally */
-        align-items: center; /* Centers vertically */
-        height: 100vh; /* Takes the full viewport height */
-        flex-direction: column; /* Ensures elements are stacked vertically */
-        text-align: center; /* Optional: Center-aligns text */
-        background-color:lightgray; /* Optional: Adds a light. background color */
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        flex-direction: column; 
+        text-align: center; 
+        background-color:lightgray; 
     }
 
     .MudDataGrid {
-        width: 200; /* Adjusts the table width */
-        max-width: 800px; /* Optional: Prevents the table from growing too large */
+        width: 200; 
+        max-width: 800px; 
     }
 
 </style>
