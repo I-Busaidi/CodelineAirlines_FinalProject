@@ -49,16 +49,18 @@ namespace CodelineAirlines.Services
             _passengerRepository.AddPassenger(passenger);
         }
 
-        public PassengerOutputDTO GetPassengerProfile(int userId)
+        public List<PassengerOutputDTO> GetPassengerProfile(int userId)
         {
             // Get the passenger from the repository
             var passenger = _passengerRepository.GetPassengerByUserId(userId);
 
             // Map the Passenger entity to the PassengerDTO
-            var passengerDTO = _mapper.Map<PassengerOutputDTO>(passenger);
+            var passengerDTO = _mapper.Map<List<PassengerOutputDTO>>(passenger);
 
             return passengerDTO;
         }
+
+
         public void UpdatePassengerDetails(int userId, PassengerInputDTOs passengerInputDTO)
         {
             // Map the DTO to the Passenger entity
