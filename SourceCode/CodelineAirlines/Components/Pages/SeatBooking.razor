@@ -6,7 +6,7 @@
 @inject SeatSelectionService SeatSelectionService
 
 <MudDrawerContainer>
-    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" OverlayAutoClose="false" Class="fixed-drawer" Style="height:90%; width:20%">
+    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" OverlayAutoClose="false" Class="fixed-drawer" Style="height:90%; width: 11%">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Selected Seats</MudText>
         </MudDrawerHeader>
@@ -18,7 +18,7 @@
                         var seatDTO = mapper.Map<SeatsOutputDTO>(seat);
                         string text = $"{seatDTO.SeatNumber} | {seatDTO.Type} | {seatDTO.SeatLocation}";
                         <MudListItem Text="@text" Icon="@Icons.Material.Filled.EventSeat" />
-                        <MudDivider />
+                        <MudDivider DividerType="DividerType.FullWidth" Light/>
                     }
                 </MudList>
             </MudCardContent>
@@ -28,8 +28,65 @@
             </MudCardActions>
         </MudCard>
     </MudDrawer>
-    <MudMainContent Style="background-color: rgba(255, 255, 255, 0.1) ; border-radius: 10px; margin-right: 400px; backdrop-filter:blur(10px); color:black; padding: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); overflow-y: auto; height:855px">
-        
+    <MudMainContent Class="carousel-section">
+        <MudText Typo="Typo.h6">First Class</MudText>
+        <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+            <MudCarouselItem Transition="Transition.Fade" Color="@Color.Primary">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="Transition.Fade" Color="@Color.Secondary">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="Transition.Fade">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Color="@Color.Primary" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+        </MudCarousel>
+        <MudDivider DividerType="DividerType.FullWidth" Light />
+        <MudText Typo="Typo.h6" Style="margin-top: 6%;">Business Class</MudText>
+        <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+            <MudCarouselItem Transition="Transition.Fade" Color="@Color.Primary">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="Transition.Fade" Color="@Color.Secondary">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="Transition.Fade">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Color="@Color.Primary" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+        </MudCarousel>
+        <MudDivider DividerType="DividerType.FullWidth" Light />
+        <MudText Typo="Typo.h6" Style="margin-top: 6%;">Economy</MudText>
+        <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+            <MudCarouselItem Transition="Transition.Fade" Color="@Color.Primary">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="Transition.Fade" Color="@Color.Secondary">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="Transition.Fade">
+                <div class="d-flex" style="height:100%">
+                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Color="@Color.Primary" Size="@Size.Large" />
+                </div>
+            </MudCarouselItem>
+        </MudCarousel>
+    </MudMainContent>
+    <MudMainContent Class="seat-map">
         <div class="seat-layout">
             <MudText Typo="Typo.h4">Select Seats</MudText>
             <MudDivider />
@@ -63,7 +120,7 @@
                         </div>
                     }
                 </div>
-                <MudDivider />
+                <MudDivider DividerType="DividerType.FullWidth" Light />
             }
         </div>
     </MudMainContent>
@@ -198,7 +255,41 @@
         background-position: center;
         height: 100vh;
     }
-    .seat-layout {
+
+    .carousel-section {
+        position: fixed;
+        width: 20%;
+        height: 90%;
+        top: 75px;
+        left: 280px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .carousel img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+
+    .seat-map {
+        position: fixed !important;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-left: 22%;
+        margin-right: 200px;
+        backdrop-filter: blur(10px);
+        color: black;
+        padding: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        overflow-y: auto;
+        height: 90%;
+        width: 50%;
+    }
+    .seat-layout 
+    {
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -209,6 +300,7 @@
         border-right: double;
         border-color: white;
         border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
 
     }
 
@@ -222,7 +314,6 @@
         position: fixed !important;/* Keeps the drawer fixed */
         top: 75px; /* Offset to allow space for a header/navbar */
         margin-right: 25px; /* Adds spacing from the right edge */
-       
         z-index: 1050; /* Keeps it above other elements */
         overflow-y: auto; /* Allows scrolling for content overflow */
         border-radius: 10px; /* Smooth rounded corners */
@@ -241,6 +332,12 @@
         justify-content: space-evenly; /* Center-align seats */
         gap: 10px; /* Space between groups of seats and aisles */
         margin-bottom: 1px;
+    }
+
+    .layout-container {
+        display: flex;
+        gap: 20px;
+        height: 100%;
     }
 
     .seat-icon {
