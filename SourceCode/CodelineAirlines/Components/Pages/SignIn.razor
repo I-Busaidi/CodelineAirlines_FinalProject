@@ -1,0 +1,73 @@
+﻿@page "/signin"
+@inject NavigationManager NavManager
+@inject IUserService UserService
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-6" Style="width: 600px; background-color: rgba(255, 255, 255, 0.2); backdrop-filter:blur(15px); border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top:auto; margin-bottom:auto">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Sign In</MudText>
+
+    <MudForm @ref="form" Model="@signInModel" @bind-IsValid="@isValid" Style="background-color:rgba(255, 255, 255, 0.9); border-radius: 5px; margin: auto; padding: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2)">
+        <MudTextField @bind-Value="signInModel.Email"
+                      Label="Email"
+                      Required="true" />
+        <MudTextField @bind-Value="signInModel.Password"
+                      Label="Password"
+                      InputType="InputType.Password"
+                      Required="true" />
+
+        <!-- Warning Alert (Directly above the button) -->
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <MudAlert Severity="Severity.Warning" Class="mt-3">@errorMessage</MudAlert>
+        }
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Login" Disabled="!isValid" Class="mt-4">
+            Sign In
+        </MudButton>
+    </MudForm>
+
+    <MudText Typo="Typo.subtitle2" Class="mt-4 text-center">
+        Don't have an account? <MudLink Href="/signup">Sign Up</MudLink>
+    </MudText>
+</MudContainer>
+
+@code {
+    private SignInModel signInModel = new();
+    private MudForm form;
+    private bool isValid;
+    private string errorMessage;
+
+    private void Login()
+    {
+        form.Validate();
+        if (form.IsValid)
+        {
+            // Call the synchronous version of Login (assuming it's implemented in UserService)
+            var result = UserService.login(signInModel.Email, signInModel.Password);
+
+            if (!string.IsNullOrWhiteSpace(result)) // Login success
+            {
+                NavManager.NavigateTo("/");
+                errorMessage = string.Empty; // Clear any previous error message
+            }
+            else
+            {
+                errorMessage = "Invalid email or password. Please try again.";
+            }
+        }
+    }
+
+    public class SignInModel
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}
+
+<style>
+    body{
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1), url('images/background.jpg'));
+    }
+</style>

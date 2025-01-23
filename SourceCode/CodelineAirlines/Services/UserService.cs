@@ -39,7 +39,7 @@ namespace CodelineAirlines.Services
                 return builder.ToString();
             }
         }
-        public void Register(UserInputDTOs userInput)
+        public bool Register(UserInputDTOs userInput)
         {
 
             if (string.IsNullOrEmpty(userInput.Password))
@@ -55,6 +55,7 @@ namespace CodelineAirlines.Services
             NewUser.Password = HashPassword(userInput.Password);
             // Add the user to the repository
             _userrepo.AddUser(NewUser);
+            return true;
 
         }
         public string GenerateJwtToken(string userId, string username, string role)
