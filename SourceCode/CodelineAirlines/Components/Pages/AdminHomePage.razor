@@ -1,0 +1,148 @@
+﻿@page "/AdminHomePage"
+@inject IAirportService airportService
+@inject IAirplaneService airplaneService
+@inject IFlightService flightService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudContainer Class="admin-dashboard-container">
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="title mt-4">Admin Dashboard</MudText>
+
+    <MudGrid Class="mt-4">
+        <!-- Manage Airports Card -->
+        <MudItem xs="12" sm="4">
+            <MudCard Class="dashboard-card">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Airports</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageAirports" FullWidth="true" Class="card-button">
+                        Manage Airports
+                    </MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Manage Airplanes Card -->
+        <MudItem xs="12" sm="4">
+            <MudCard Class="dashboard-card">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Airplanes</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageAirplanes" FullWidth="true" Class="card-button">
+                        Manage Airplanes
+                    </MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Manage Flights Card -->
+        <MudItem xs="12" sm="4">
+            <MudCard Class="dashboard-card">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Flights</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageFlights" FullWidth="true" Class="card-button">
+                        Manage Flights
+                    </MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Style="justify-content: center;" Class="mt-4">
+        <MudItem xs="4" Class="mr-2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ReturnToHomePage" FullWidth="true" Class="return-button">
+                Return to Home
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private void NavigateToManageAirports()
+    {
+        NavigationManager.NavigateTo("/manage-airports"); // Replace with your actual route for managing airports
+    }
+
+    private void NavigateToManageAirplanes()
+    {
+        NavigationManager.NavigateTo("/manage-airplanes"); // Replace with your actual route for managing airplanes
+    }
+
+    private void NavigateToManageFlights()
+    {
+        NavigationManager.NavigateTo("/manage-flights"); // Replace with your actual route for managing flights
+    }
+
+    private void ReturnToHomePage()
+    {
+        NavigationManager.NavigateTo("/"); // Navigate to the home page
+    }
+}
+
+<style>
+    .admin-dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .title {
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .dashboard-card {
+        border-radius: 15px; /* Rounded corners for cards */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+        overflow: hidden; /* Ensure content inside the card stays inside */
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px); /* Slight lift effect */
+            box-shadow: 0 16px 24px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+        }
+
+    .card-title {
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 15px;
+    }
+
+    .card-button {
+        font-weight: 600;
+        padding: 12px;
+        font-size: 16px;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
+        border-radius: 50px;
+    }
+
+        .card-button:hover {
+            background-color: #0056b3; /* Darker shade of blue on hover */
+        }
+
+    .return-button {
+        font-weight: bold;
+        margin-top: 20px;
+        border-radius: 50px;
+        padding: 12px;
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+
+        .return-button:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+    /* Card layout spacing */
+    .mt-4 {
+        margin-top: 30px !important;
+    }
+
+    .mr-2 {
+        margin-right: 10px;
+    }
+</style>
