@@ -89,7 +89,7 @@ namespace CodelineAirlines.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public string login(string email, string password)
+        public User login(string email, string password)
         {
             
             // Hash the entered password
@@ -105,7 +105,8 @@ namespace CodelineAirlines.Services
 
             else
             {
-                return GenerateJwtToken(user.UserId.ToString(), user.UserName,user.UserRole);
+                //return GenerateJwtToken(user.UserId.ToString(), user.UserName,user.UserRole);
+                return user;
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace CodelineAirlines.Helpers
 {
@@ -30,6 +31,21 @@ namespace CodelineAirlines.Helpers
                 return claim?.Value ?? throw new ArgumentException($"Claim '{claimType}' not found in the token.");
             }
             throw new ArgumentException("Invalid JWT Token.");
+        }
+
+        public static IEnumerable<Claim> GetClaimsFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            if (handler.CanReadToken(token))
+            {
+                var jwtToken = handler.ReadJwtToken(token);
+
+                // Return the claims from the token
+                return jwtToken.Claims;
+            }
+
+            return Enumerable.Empty<Claim>();
         }
     }
 }

@@ -52,31 +52,31 @@ namespace CodelineAirlines.Controllers
 
 
         }
-        [AllowAnonymous]
-        [HttpGet("Login")]
-        public IActionResult Login(string email, string password)
-        {
-            try
-            {
-                string token = _userService.login(email, password);
+        //[AllowAnonymous]
+        //[HttpGet("Login")]
+        //public IActionResult Login(string email, string password)
+        //{
+        //    try
+        //    {
+        //        string token = _userService.login(email, password);
 
-                if (token == null)
-                {
+        //        if (token == null)
+        //        {
 
-                    return Unauthorized(new { Message = "Invalid Credentials" });
-                }
+        //            return Unauthorized(new { Message = "Invalid Credentials" });
+        //        }
 
-                return Ok(new { token });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", details = ex.Message });
-            }
-        }
+        //        return Ok(new { token });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { message = "An error occurred while processing your request.", details = ex.Message });
+        //    }
+        //}
         [Authorize]
         [HttpGet("GetUserDetails")]
         public IActionResult GetUserDetails()

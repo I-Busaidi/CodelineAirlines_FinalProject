@@ -1,6 +1,9 @@
 ﻿@page "/book-flight"
 @page "/book-flight/{FlightNo}"
+
+@inject AppState appState
 @inject NavigationManager NavManager
+@attribute [Authorize(Roles = "user")]
 @using MudBlazor
     @using System.ComponentModel.DataAnnotations
 
@@ -28,7 +31,7 @@
                 </MudSelect>
 
                 <!-- Birth Date -->
-                <MudDatePicker Label="Date of Birth" @bind-Date="model.BirthDate" Required="true" Class="mb-3" />
+                <MudDatePicker Label="Date of Birth" @bind-Date="pickedDate" Required="true" Class="mb-3" />
 
                 <!-- Nationality -->
                 <MudTextField Label="Nationality" @bind-Value="model.Nationality" Required="true" Class="mb-3" />
@@ -38,7 +41,7 @@
                 <!-- Buttons -->
                 <MudItem xs="12" Class="d-flex justify-center mt-6">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" ButtonType="ButtonType.Submit" Size="Size.Medium">Add Passenger</MudButton>
-                    <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty">CHOOSE YOUR SEAT</MudButton>
+                    <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty" OnClick="NavigateToSeatBooking">CHOOSE YOUR SEAT</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
                 </MudItem>
             </EditForm>
@@ -46,7 +49,7 @@
 
         <!-- Right: Passenger List -->
         <div class="w-50" style="max-height: 80vh; overflow-y: auto;">
-            <MudText Typo="Typo.h5" Class="mb-4 text-center">Passenger List</MudText>
+            <MudText Typo="Typo.h5" Class="mb-4 text-center">Passengers</MudText>
             @if (passengerList.Count > 0)
             {
                 <MudTable Items="passengerList" Dense="true" Hover="true">
@@ -62,7 +65,7 @@
                         <MudTd>@context.PassengerName</MudTd>
                         <MudTd>@context.Passport</MudTd>
                         <MudTd>@context.Gender</MudTd>
-                        <MudTd>@context.BirthDate?.ToString("dd/MM/yyyy")</MudTd>
+                        <MudTd>@context.BirthDate.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")</MudTd>
                         <MudTd>@context.Nationality</MudTd>
                         <MudTd>
                             <MudButton Icon="Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemovePassenger(context))">Remove</MudButton>
@@ -84,32 +87,33 @@
     [Parameter]
     public string FlightNo { get; set; }
     bool success;
+    private DateTime? pickedDate = null;
     public string[] gender = new string[2] { "Male", "Female" };
-    private PassengerInputDTO model = new PassengerInputDTO();
-    private List<PassengerInputDTO> passengerList = new();
+    private PassengerInputDTOs model = new PassengerInputDTOs();
+    private List<PassengerInputDTOs> passengerList = new();
     private bool isPassengerListEmpty = true;
 
     private void AddPassenger(EditContext context)
     {
         success = true;
         // Add the current passenger to the list
-        passengerList.Add(new PassengerInputDTO
+        passengerList.Add(new PassengerInputDTOs
             {
                 PassengerName = model.PassengerName,
                 Passport = model.Passport,
                 Gender = model.Gender,
-                BirthDate = model.BirthDate,
+                BirthDate = DateOnly.FromDateTime((DateTime)pickedDate),
                 Nationality = model.Nationality
             });
 
         // Clear the form by resetting the current passenger object
-        model = new PassengerInputDTO(); // Clears the form fields for new entry
+        model = new PassengerInputDTOs(); // Clears the form fields for new entry
         isPassengerListEmpty = false;
         // Force UI to re-render to show updated list
         StateHasChanged();
     }
 
-    private void RemovePassenger(PassengerInputDTO passenger)
+    private void RemovePassenger(PassengerInputDTOs passenger)
     {
         passengerList.Remove(passenger);
         if (passengerList.Count == 0)
@@ -121,25 +125,14 @@
 
     private void NavigateToSeatBooking()
     {
+        appState.PassengersInput.AddRange(passengerList);
+        appState.NotifyStateChanged();
         
+        NavManager.NavigateTo($"/seatBooking?flightNo={FlightNo}");
     }
 
     private void NavigateBack()
     {
         NavManager.NavigateTo("/flights");
-    }
-
-    public class PassengerInputDTO
-    {
-        [Required]
-        public string PassengerName { get; set; }
-        [Required]
-        public string Passport { get; set; }
-        [Required]
-        public string Gender { get; set; }
-        [Required]
-        public DateTime? BirthDate { get; set; }
-        [Required]
-        public string Nationality { get; set; }
     }
 }

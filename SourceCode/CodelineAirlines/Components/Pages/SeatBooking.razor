@@ -3,7 +3,11 @@
 @inject NavigationManager NavigationManager
 @inject IAirplaneSpecService airplaneSpecService
 @inject IMapper mapper
+@inject IFlightService flightService
 @inject SeatSelectionService SeatSelectionService
+@inject AppState appState
+
+@attribute [Authorize(Roles = "user")]
 
 <MudDrawerContainer>
     <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" OverlayAutoClose="false" Class="fixed-drawer" Style="height:90%; width: 15%">
@@ -130,15 +134,8 @@
 @code {
     private bool drawerOpen = true; // Controls drawer visibility
     private List<SeatTemplate> selectedSeats = new(); // Stores selected seats
-
-    private Airplane airplane { get; set; } = new Airplane
-    {
-        AirplaneId = 1,
-        AirplaneModel = "Codeline 880",
-        ManufactureDate = DateOnly.MinValue,
-        CurrentAirportId = 1,
-        IsActive = true
-    };
+    private int flightNo { get; set; }
+    private Airplane airplane { get; set; }
 
     private AirplaneSpecs airplaneSpecs { get; set; }
     private List<SeatTemplate> seats = new List<SeatTemplate>();
@@ -147,6 +144,15 @@
 
     protected override void OnInitialized()
     {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        flightNo = int.Parse(queryParams["flightNo"]);
+
+        var flight = flightService.GetFlightByIdWithRelatedData(flightNo);
+
+        airplane = flight.Airplane;
+
         airplaneSpecs = airplaneSpecService.GetSpecsByModelWithRelatedData(airplane.AirplaneModel);
 
         if (airplaneSpecs?.Seats != null)
