@@ -38,7 +38,7 @@
                 <!-- Buttons -->
                 <MudItem xs="12" Class="d-flex justify-center mt-6">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" ButtonType="ButtonType.Submit" Size="Size.Medium">Add Passenger</MudButton>
-                    <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2">CHOOSE YOUR SEAT</MudButton>
+                    <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty">CHOOSE YOUR SEAT</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
                 </MudItem>
             </EditForm>
@@ -87,6 +87,7 @@
     public string[] gender = new string[2] { "Male", "Female" };
     private PassengerInputDTO model = new PassengerInputDTO();
     private List<PassengerInputDTO> passengerList = new();
+    private bool isPassengerListEmpty = true;
 
     private void AddPassenger(EditContext context)
     {
@@ -103,7 +104,7 @@
 
         // Clear the form by resetting the current passenger object
         model = new PassengerInputDTO(); // Clears the form fields for new entry
-
+        isPassengerListEmpty = false;
         // Force UI to re-render to show updated list
         StateHasChanged();
     }
@@ -111,7 +112,16 @@
     private void RemovePassenger(PassengerInputDTO passenger)
     {
         passengerList.Remove(passenger);
+        if (passengerList.Count == 0)
+        {
+            isPassengerListEmpty = true;
+        }
         StateHasChanged(); // Ensure UI updates when a passenger is removed
+    }
+
+    private void NavigateToSeatBooking()
+    {
+        
     }
 
     private void NavigateBack()

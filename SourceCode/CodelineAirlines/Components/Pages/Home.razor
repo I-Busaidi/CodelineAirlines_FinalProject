@@ -1,43 +1,112 @@
 ﻿@page "/"
+
+@inject IFlightService flightService
+@inject IAirportService airportService
+@inject NavigationManager navManager
+
 <PageTitle>Home</PageTitle>
+<!-- Carousel Section -->
+<MudContainer Class="carousel-container">
+    <MudCarousel Class="mud-carousel" Style="height:500px; width: 100vw; " TData="object">
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic1.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>The sky is not the limit, it’s just the beginning.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic2.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>Legends On Board.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic3.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>See the World Differently.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic5.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>The better way to fly.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic6.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>The world's favourite airline.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic7.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>Making it easier to get there.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic8.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>Great people. Great seats. Great service.</h2>
+            </div>
+        </MudCarouselItem>
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/LandscapePic9.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>On Time, Every Time.</h2>
+            </div>
+        </MudCarouselItem>
+    </MudCarousel>
+</MudContainer>
 <MudContainer Class="search-wrapper">
     <MudContainer Class="search-section">
         <MudGrid Gutter="2" AlignItems="Center" JustifyContent="SpaceBetween">
             <!-- From Section -->
             <MudItem xs="12" sm="6" md="3">
-                <MudAutocomplete T="string" Label="From"
-                                 Placeholder="Enter Departure Location"
-                                 @bind-Value="FromLocation"
-                                 SearchFunc="@SearchFromLocations"
-                                 ToStringFunc="@(e => e ?? "")">
-                    <NoItemsTemplate>
-                        <MudText Align="Align.Center" Class="px-4 py-1">
-                            No locations found
-                        </MudText>
-                    </NoItemsTemplate>
-                </MudAutocomplete>
+                <MudSelect T="AirportOutputDTO"
+                           Value="FromLocation"
+                           Variant="Variant.Filled"
+                           Label="Origin"
+                           Margin="Margin.None"
+                           Dense="false"
+                           Disabled="false"
+                           ReadOnly="false"
+                           Placeholder="Select origin"
+                           ValueChanged="OnOriginSelected">
+                           
+                    @foreach (var airport in airportsOrigin)
+                    {
+                        string choiceItem = $"{airport.City}, {airport.Country}, {airport.AirportName}";
+                        <MudSelectItem Value="airport">@choiceItem</MudSelectItem>
+                    }
+                </MudSelect>
             </MudItem>
 
             <!-- Where To Section -->
             <MudItem xs="12" sm="6" md="3">
-                <MudAutocomplete T="string" Label="Where To"
-                                 Placeholder="Enter Destination Location"
-                                 @bind-Value="ToLocation"
-                                 SearchFunc="@SearchToLocations"
-                                 ToStringFunc="@(e => e ?? "")">
-                    <NoItemsTemplate>
-                        <MudText Align="Align.Center" Class="px-4 py-1">
-                            No locations found
-                        </MudText>
-                    </NoItemsTemplate>
-                </MudAutocomplete>
+                <MudSelect T="AirportOutputDTO"
+                           Value="ToLocation"
+                           Variant="Variant.Filled"
+                           Label="Destination"
+                           Margin="Margin.None"
+                           Dense="false"
+                           ReadOnly="false"
+                           Disabled="@originEmpty"
+                           Placeholder="@("Select Destination")"
+                           ValueChanged="OnDestSelected">
+                    @foreach (var airport in airportsDest)
+                    {
+                        string choiceItem = $"{airport.City}, {airport.Country}, {airport.AirportName}";
+                        <MudSelectItem Value="airport">@choiceItem</MudSelectItem>
+                    }
+                </MudSelect>
             </MudItem>
 
             <!-- Travel Dates Section -->
             <MudItem xs="12" sm="6" md="3">
                 <MudStack>
                     <MudDateRangePicker @ref="_picker" Label="Travel Dates" @bind-DateRange="_dateRange"
-                                        AutoClose="true" PickerVariant="PickerVariant.Dialog">
+                                        AutoClose="true" PickerVariant="PickerVariant.Dialog" Color="Color.Warning">
                         <PickerActions>
                             <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
                             <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton>
@@ -46,38 +115,27 @@
                     </MudDateRangePicker>
                 </MudStack>
             </MudItem>
-
+            <MudSpacer />
             <!-- Find Flights Button -->
             <MudItem xs="12" sm="12" md="1" Align="Align.Center">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                           OnClick="FindFlights">
-                    Find Flights
+                <MudButton Variant="Variant.Filled" Color="Color.Warning"
+                           OnClick="FindFlights"
+                           Disabled="@destEmpty">
+                    Search Flights
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="1" Align="Align.Center">
+                <MudButton Variant="Variant.Filled" Color="Color.Tertiary"
+                            OnClick="ViewAllFlights">
+                    All Flights
                 </MudButton>
             </MudItem>
         </MudGrid>
     </MudContainer>
 </MudContainer>
 
-<!-- Add break tags for spacing -->
-<br />
-<br />
 
-<!-- Carousel Section -->
-<MudContainer Class="carousel-container">
-    <MudCarousel Class="mud-width-full" Style="height:300px;" TData="object">
-        <MudCarouselItem Transition="@Transition.Slide" Color="@Color.Primary">
-            <MudImage Src="IMG_0395.jpg" Class="carousel-image" />
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Slide" Color="@Color.Secondary">
-            <MudImage Src="IMG_0394.jpg" Class="carousel-image" />
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Slide">
-            <MudImage Src="IMG_0396.jpg" Class="carousel-image" />
-        </MudCarouselItem>
-    </MudCarousel>
-</MudContainer>
 
-<br />
 <br />
 <!-- Trending Destinations Section -->
 <MudContainer Class="trending-section">
@@ -96,59 +154,42 @@
 <!-- Flights Section -->
 <MudContainer>
     <div class="card-container">
+        
         @foreach (var flight in flights)
         {
+            count++;
+            string imgSrc = $"IMG{count}.jpg";
+            string route = $"{flight.SourceAirportName} to {flight.DestinationAirportName}";
             <MudCard Class="card-item">
-                <MudCardMedia Image="@flight.ImageUrl" Title="@flight.Route" Class="card-image" />
+                <MudCardMedia Image="@imgSrc" Title="@flight.SourceAirportName" Class="card-image" />
                 <MudCardContent>
-                    <MudText Typo="Typo.h6">@flight.Route</MudText>
-                    <MudText Typo="Typo.body2">@flight.DepartureDate</MudText>
-                    <MudText Typo="Typo.h6">From OMR @flight.Price</MudText>
-                    <MudButton Color="Color.Primary" OnClick="@(() => BookFlight(flight))">Book now</MudButton>
+                    <MudText Typo="Typo.h6">@route</MudText>
+                    <MudText Typo="Typo.body2">@flight.ScheduledDepartureDate.ToString("dd / MM / yyyy")</MudText>
+                    <MudText Typo="Typo.h6">From OMR @flight.Cost</MudText>
+                    <MudButton Color="Color.Info" >Book now</MudButton>
                 </MudCardContent>
             </MudCard>
+            if (count == 4)
+            {
+                count = 0;
+                break;
+            }
         }
     </div>
 </MudContainer>
 
 
-
 @code {
-    private List<Flight> flights = new List<Flight>
-    {
-        new Flight { Route = "Muscat (MCT) to Manila (MNL)", DepartureDate = "Departing: 11/05/2025", Price = "146", ImageUrl = "IMG_0404.jpg"  },
-        new Flight { Route = "Khasab (KHS) to Muscat (MCT)", DepartureDate = "Departing: 24/01/2025", Price = "18", ImageUrl = "IMG_0403.jpg"},
-        new Flight { Route = "Muscat (MCT) to Dhaka (DAC)", DepartureDate = "Departing: 07/02/2025", Price = "52", ImageUrl = "IMG_0406.jpg" },
-        new Flight { Route = "Muscat (MCT) to Kuala Lumpur (KUL)", DepartureDate = "Departing: 08/03/2025", Price = "82", ImageUrl = "IMG_0405.jpg" }
-    };
-
-    private void BookFlight(Flight flight)
-    {
-        // Handle flight booking logic
-        Console.WriteLine($"Booking flight: {flight.Route}");
-    }
-
-    public class Flight
-    {
-        public string Route { get; set; }
-        public string DepartureDate { get; set; }
-        public string Price { get; set; }
-        public string ImageUrl { get; set; }
-    }
-}
-@code {
+    private int count = 0;
     private bool arrows = true;
-    private bool bullets = true;
+    private bool bullets = false;
     private bool enableSwipeGesture = true;
     private bool autocycle = true;
-    private Transition transition = Transition.Slide;
-}
-@code {
+
     private MudDateRangePicker _picker;
-    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(30).Date);
     private bool _autoClose;
-}
-@code {
+
     private bool IsDatePickerOpen = false; 
     private DateTime? TravelDate = DateTime.Today; 
     private string TravelDateText => TravelDate?.ToShortDateString() ?? "Select your travel date";
@@ -156,66 +197,129 @@
     {
         IsDatePickerOpen = !IsDatePickerOpen;
     }
-    private string FromLocation; 
-    private string ToLocation;   
-    private decimal? Cost;       
-    private async Task<IEnumerable<string>> SearchFromLocations(string value, CancellationToken token)
+    private AirportOutputDTO FromLocation;
+    private AirportOutputDTO ToLocation;
+
+    bool originEmpty = true;
+    bool destEmpty = true;
+    private void OnOriginSelected(AirportOutputDTO airport)
     {
-        var locations = new List<string>
+        if (airport != null)
         {
-            "Muscat, Oman (MCT)",
-            "Abu Dhabi, United Arab Emirates (AUH)",
-            "Accra, Ghana (ACC)",
-            "Addis Ababa, Ethiopia (ADD)"
-        };
-        return await Task.FromResult(locations
-            .Where(x => x.Contains(value, StringComparison.OrdinalIgnoreCase))
-            .Take(5));
+            FromLocation = airport;
+            // Filter destination airports, excluding the selected origin airport
+            airportsDest = airports.Where(a => a.AirportName != FromLocation.AirportName).ToList();
+            originEmpty = false;
+
+            // Optional: Log or update UI
+            Console.WriteLine($"Origin selected: {FromLocation.City}, {FromLocation.Country}, {FromLocation.AirportName}");
+        }
+        else
+        {
+            originEmpty = true;
+            airportsDest = airports; // Reset to all airports
+        }
     }
-    private async Task<IEnumerable<string>> SearchToLocations(string value, CancellationToken token)
+
+    private void OnDestSelected(AirportOutputDTO airport)
     {
-        var locations = new List<string>
+        if (airport != null)
         {
-            "Dubai, United Arab Emirates (DXB)",
-            "Doha, Qatar (DOH)",
-            "Kigali, Rwanda (KGL)",
-            "Nairobi, Kenya (NBO)"
-        };
-        return await Task.FromResult(locations
-            .Where(x => x.Contains(value, StringComparison.OrdinalIgnoreCase))
-            .Take(5));
+            ToLocation = airport;
+            // Filter destination airports, excluding the selected origin airport
+            airportsOrigin = airports.Where(a => a.AirportName != ToLocation.AirportName).ToList();
+            destEmpty = false;
+
+            // Optional: Log or update UI
+            Console.WriteLine($"Destination selected: {ToLocation.City}, {ToLocation.Country}, {ToLocation.AirportName}");
+        }
+        else
+        {
+            destEmpty = true;
+            airportsOrigin = airports; // Reset to all airports
+        }
     }
+
+    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
+    private List<AirportOutputDTO> airportsOrigin = new List<AirportOutputDTO>();
+    private List<AirportOutputDTO> airportsDest = new List<AirportOutputDTO>();
+    private List<FlightOutputDTO> flights = new List<FlightOutputDTO>();
+
+    protected override void OnInitialized()
+    {
+        airports = airportService.GetAllAirports();
+        airportsOrigin = airports.ToList();
+        flights = flightService.GetAllFlights();
+    }
+
+
+
     private void FindFlights()
     {
-        if (string.IsNullOrWhiteSpace(FromLocation) || string.IsNullOrWhiteSpace(ToLocation) || Cost is null)
+        if (string.IsNullOrWhiteSpace(FromLocation.AirportName) || string.IsNullOrWhiteSpace(ToLocation.AirportName))
         {
             Console.WriteLine("Please fill in all fields before searching.");
-            return;
         }
-        Console.WriteLine($"Searching flights from {FromLocation} to {ToLocation} on {TravelDate?.ToShortDateString()} with a cost limit of {Cost}.");
+        else
+        {
+            var startDate = _dateRange.Start?.ToString("yyyy-MM-dd");
+            var endDate = _dateRange.End?.ToString("yyyy-MM-dd");
+            navManager.NavigateTo($"/flights?origin={FromLocation.AirportName}&dest={ToLocation.AirportName}&startdate={startDate}&enddate={endDate}");
+        }
+    }
+
+    private void ViewAllFlights()
+    {
+        navManager.NavigateTo("/flights");
     }
 }
 <style>
     .carousel-image {
+        background-position: center 30%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        bottom: 0;
+
+
+        position: sticky;
+        top: 0;
+
         width: 100%;
-        height: 400px; 
-        object-fit: cover; 
     }
 
+    .text-overlay {
+        position: absolute;
+        top: 50%; /* Center vertically */
+        left: 50%; /* Center horizontally */
+        transform: translate(-50%, -50%); /* Adjust for exact centering */
+        color: white; /* Text color */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Add shadow to text */
+        padding: 10px 20px; /* Add some padding around the text */
+        border-radius: 10px; /* Optional: Rounded corners */
+        text-align: center;
+        z-index: 2; /* Ensure the text appears above the image */
+        white-space: nowrap; /* Prevent text wrapping */
+    }
   
-        flex-wrap: wrap; 
+    .mud-carousel
+    {
+        border-radius: 0 0 20px 20px;
+        height: 500px;
+        margin: 0;
+        padding: 0 20%;
+        overflow: hidden;
+        min-width: 1500px;
+        align-self: center ;
     }
 
-    .card-item {
-        width: 250px; 
-        margin: 16px; 
-    }
+
+    
 
     .card-image {
         height: 150px;
         object-fit: cover;
         border-radius: 4px; 
-    } */
+    } 
 
 
 
@@ -224,8 +328,8 @@
     }
 
     .carousel-container {
-        margin-bottom: 50px; 
-      
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
    
@@ -238,31 +342,37 @@
     .search-wrapper {
         display: flex;
         justify-content: center;
-        margin-top: 50px; 
+        margin-top: -80px;
+        padding: 0;
     }
 
     .search-section {
-        width: 80%; 
-        max-width: 1200px;
-        padding: 16px; 
-        background-color:lightgrey; 
+        width: 100%;
+        padding: 40px; 
+        background-color: rgba(244, 244, 244, 0.98);
+        backdrop-filter: blur(5px);
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
-        border-radius: 20px; 
+        border-radius: 10px; 
+        z-index: 4;
     }
   
     .card-container {
         display: flex;
-        justify-content: center; 
+        justify-content: space-between; 
         align-items: center;
         flex-wrap: nowrap; 
-        margin: 20px auto; 
-        max-width: 90%; 
         gap: 20px; 
+
+        padding: 0;
     }
 
     .card-item {
-        width: 250px;
+        width: 300px;
         margin: 0; 
+        background-color: rgba(244, 244, 244, 0.98);
+        backdrop-filter: blur(5px);
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
     }
 
     .card-image {
@@ -273,12 +383,9 @@
 
 
     body {
-        background-image: url("K.jpg");
-        background-size: cover; 
-        background-position: center;
-        background-repeat: no-repeat; 
+        margin-top: -64px;
+        
         height: 100vh; 
-        margin: 0; 
     }
 
 </style>

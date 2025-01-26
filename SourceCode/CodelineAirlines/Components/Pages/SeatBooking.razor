@@ -1,4 +1,4 @@
-﻿@page "/sedfgb"
+﻿@page "/seatBooking"
 
 @inject NavigationManager NavigationManager
 @inject IAirplaneSpecService airplaneSpecService
@@ -89,7 +89,7 @@
     <MudMainContent Class="seat-map">
         <div class="seat-layout">
             
-            <MudText Typo="Typo.h5"> <MudIcon Icon="@Icons.Material.Filled.AirplanemodeActive" Style="rotate: 45deg;" Color="Color.Warning"></MudIcon> Select Seats</MudText>
+            <MudText Typo="Typo.h5"> Select Seats</MudText>
             <MudDivider />
             @foreach (var seatClass in seatLayoutByClass)
             {
@@ -134,7 +134,7 @@
     private Airplane airplane { get; set; } = new Airplane
     {
         AirplaneId = 1,
-        AirplaneModel = "Boeing 707",
+        AirplaneModel = "Codeline 880",
         ManufactureDate = DateOnly.MinValue,
         CurrentAirportId = 1,
         IsActive = true

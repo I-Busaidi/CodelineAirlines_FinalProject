@@ -3,8 +3,17 @@
 @inject NavigationManager NavManager
 @using MudBlazor
 
-<MudText Typo="Typo.h4" Class="mb-4">Flight List</MudText>
-
+<MudContainer Class="carousel-container">
+    <MudCarousel Class="mud-carousel" Style="height:500px; width: 100vw; " TData="object" AutoCycle="false" ShowArrows="false" ShowBullets="false" >
+        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
+            <MudImage Src="/Images/backgroundCarousel2.jpg" Class="carousel-image" />
+            <div class="text-overlay">
+                <h2>Flights List.</h2>
+            </div>
+        </MudCarouselItem>
+    </MudCarousel>
+</MudContainer>
+<MudContainer Style="align-content: center; background-color: transparent; z-index: auto; margin-top: -90px; padding: 20px; border-radius: 10px; border-color: aqua; border:solid;">
 <MudExpansionPanels>
     @if (flights != null && flights.Any())
     {
@@ -43,13 +52,46 @@
         </MudExpansionPanel>
     }
 </MudExpansionPanels>
-
+</MudContainer>
 @code {
+    public string? Origin = null;
+    public string? Dest = null;
+    public DateTime? startDate = null;
+    public DateTime? endDate = null;
+
     protected override void OnInitialized()
     {
-        GetFlights();
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        Origin = queryParams["origin"];
+        Dest = queryParams["dest"];
+        if (queryParams["startdate"] != null && DateTime.TryParse(queryParams["startdate"], out var parsedStartDate))
+        {
+            startDate = parsedStartDate;
+        }
+
+        if (queryParams["enddate"] != null && DateTime.TryParse(queryParams["enddate"], out var parsedEndDate))
+        {
+            endDate = parsedEndDate;
+        }
+
+        if (Origin != null && Dest != null && startDate != null && endDate != null)
+        {
+            GetFilteredFlights();
+        }
+        else
+        {
+            GetFlights();
+        }
     }
     private List<FlightOutputDTO> flights { get; set; }
+
+    private void GetFilteredFlights()
+    {
+        flights = flightService.GetAllFlights().Where(f => f.SourceAirportName == Origin && f.DestinationAirportName == Dest && f.ScheduledDepartureDate >= startDate && f.ScheduledDepartureDate <= endDate ).ToList();
+    }
+
     private void GetFlights()
     {
         flights = flightService.GetAllFlights();
@@ -60,3 +102,51 @@
         NavManager.NavigateTo($"/book-flight/{flightNo}");
     }
 }
+
+<style>
+    body {
+        margin-top: -64px;
+        height: 100vh;
+    }
+
+    .carousel-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: linear-gradient(rgba(255, 255, 255, 0.1),rgba(255, 255, 255, 0.2),rgba(255, 255, 255, 0.3),rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 1));
+    }
+
+    .carousel-image {
+        background-position: center 30%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background: linear-gradient(rgba(255, 255, 255, 0.1),rgba(255, 255, 255, 0.2),rgba(255, 255, 255, 0.3),rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 1));
+        bottom: 0;
+        position: sticky;
+        top: 0;
+        width: 100%;
+    }
+
+    .text-overlay {
+        position: absolute;
+        top: 40%; /* Center vertically */
+        left: 50%; /* Center horizontally */
+        transform: translate(-50%, -50%); /* Adjust for exact centering */
+        color: white; /* Text color */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Add shadow to text */
+        padding: 10px 20px; /* Add some padding around the text */
+        border-radius: 10px; /* Optional: Rounded corners */
+        text-align: center;
+        z-index: 2; /* Ensure the text appears above the image */
+        white-space: nowrap; /* Prevent text wrapping */
+    }
+
+    .mud-carousel {
+        border-radius: 0 0 20px 20px;
+        height: 500px;
+        margin: 0;
+        padding: 0 20%;
+        overflow: hidden;
+        min-width: 1500px;
+        align-self: center;
+    }
+</style>

@@ -10,43 +10,26 @@
 @* Needed for snackbars *@
 <MudSnackbarProvider />
 
-<head>
-    <title>Codeline Air - Your Airline</title>
-</head>
+<MudLayout >
+    <MudAppBar Elevation="0" Style="background-color: transparent; position: fixed; z-index: 10;">
+        <MudContainer Style="display: flex; background-color: rgba(0, 0, 0, 0.4); border-radius: 5px; backdrop-filter:blur(5px); justify-items: center; align-items: center; height: 60px;">
+            <a href="/"><MudImage Src="codeline-airlines-logo-no_background.png" Style="height: 55px; width: 75px; background-color:rgba(255, 255, 255, 0.09); border-radius: 10px"></MudImage></a>
+            <MudText Typo="Typo.h5" Class="ml-3" Color="Color.Default" Style="font-family: Consolas;">CODELINE AIRLINES</MudText>
+            <MudSpacer />
+            <MudButtonGroup Variant="Variant.Text" Style="justify-content: space-evenly">
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-
-        <div class="top-row px-4">
-            <div class= style="display: flex; align-items: center; position: absolute; top: 10px; left: 10px;">
-                <img src="Logo.jpg" style="height: 40px; margin-right: 10px; color:lightgray">
-                <span style="color: light lightgray; font-size: 1.5rem; font-weight: bold;">Codeline Air</span>
-            </div>
-
-         
+                <MudButton Href="/bookings" Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.AirplaneTicket"></MudIcon> &nbsp; Bookings</MudButton>
+                <MudButton Href="/Profile" Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.AccountCircle"></MudIcon> &nbsp; Profile</MudButton>
+                
+                <MudSpacer />
+                <MudButton Href="/signup" Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.PersonAddAlt"></MudIcon> &nbsp; Sign-Up</MudButton>
+                <MudButton Href="/signin" Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.Login"></MudIcon> &nbsp; Log-In </MudButton>
+                
+            </MudButtonGroup>
             
-            <NavLink class="nav-link" href="sign in">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> sign in
-            </NavLink>
-
-
-            
-          
-          
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+        </MudContainer>
+    </MudAppBar>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
