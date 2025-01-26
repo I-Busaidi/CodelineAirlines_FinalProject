@@ -1,0 +1,123 @@
+﻿@page "/AddFlight"
+
+@inject IFlightService flightService
+@inject ICompoundService compoundService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+
+<MudContainer Class="add-flight-container">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-4">Add New Flight</MudText>
+
+    <MudForm @ref="flightForm" OnValidSubmit="HandleValidSubmit">
+        <!-- Source Airport -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField Label="Source Airport Name"
+                              @bind-Value="flightInput.SourceAirportName"
+                              Required="true"
+                              For="@(() => flightInput.SourceAirportName)" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Destination Airport -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField Label="Destination Airport Name"
+                              @bind-Value="flightInput.DestinationAirportName"
+                              Required="true"
+                              For="@(() => flightInput.DestinationAirportName)" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Airplane ID -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField Label="Airplane ID"
+                              @bind-Value="flightInput.AirplaneId"
+                              Type="Number"
+                              Required="true"
+                              For="@(() => flightInput.AirplaneId)" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Flight Cost -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField Label="Flight Cost (OMR)"
+                              @bind-Value="flightInput.Cost"
+                              Type="Number"
+                              Required="true"
+                              For="@(() => flightInput.Cost)" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Duration -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField Label="Flight Duration (hh:mm)"
+                              @bind-Value="flightInput.Duration"
+                              Type="Text"
+                              Required="true"
+                              For="@(() => flightInput.Duration)"
+                              InputAdornment="Adornment.End"
+                              InputAdornmentText="hh:mm" />
+            </MudItem>
+        </MudGrid>
+        <!-- Scheduled Departure Date -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudDatePicker Label="Scheduled Departure Date" @bind-Date="dateInput" Required="true" Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Submit Button -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Type="Submit" FullWidth="true">
+                    Add Flight
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+
+    <MudSpacer />
+
+    <MudGrid Style="justify-content: center;" Class="mt-4">
+        <MudItem xs="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+                Return
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private FlightInputDTO flightInput = new FlightInputDTO();
+    private MudForm flightForm;
+    private DateTime? dateInput = null;
+    // Handle form submission
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            flightInput.ScheduledDepartureDate = (DateTime)dateInput;
+            // Call the service to add the new flight (implement this in your flight service)
+            compoundService.AddFlight(flightInput);
+
+            // Redirect to the flight list page (or success page)
+            NavigationManager.NavigateTo("/"); // Or navigate to your flights list page
+        }
+        catch (Exception ex)
+        {
+            // Handle any errors during submission (e.g., show a notification or error message)
+            Console.WriteLine($"Error adding flight: {ex.Message}");
+        }
+    }
+
+    // Return to the previous page (home or flight list)
+    private void ReturnToPreviousPage()
+    {
+        NavigationManager.NavigateTo("/"); // Navigate to the previous page (or home)
+    }
+}

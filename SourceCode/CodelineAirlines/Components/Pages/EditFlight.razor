@@ -1,0 +1,92 @@
+﻿@page "/EditFlight"
+
+@inject IFlightService flightService
+@inject ICompoundService compoundService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudContainer Class="edit-flight-container">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-4">Edit Flight</MudText>
+
+    <MudForm @ref="flightForm" OnValidSubmit="HandleValidSubmit">
+        <!-- Airplane ID -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField Label="Airplane ID"
+                              @bind-Value="flightInput.AirplaneId"
+                              Type="Number"
+                              Required="true"
+                              For="@(() => flightInput.AirplaneId)" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Scheduled Departure Date -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudDatePicker Label="Scheduled Departure Date" @bind-Date="date" Required="true" Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <!-- Submit Button -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Type="Submit" FullWidth="true">
+                    Save Changes
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+
+    <MudSpacer />
+
+    <MudGrid Style="justify-content: center;" Class="mt-4">
+        <MudItem xs="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+                Return
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    [Parameter] public string FlightNo { get; set; } = "1";
+    private DateTime? date = null;
+    private FlightInputDTO flightInput = new FlightInputDTO();
+    private MudForm flightForm;
+    private Models.Flight flight = new Models.Flight();
+    // Load flight details when the page is initialized
+    protected override void OnInitialized()
+    {
+        flight = flightService.GetFlightByIdWithRelatedData(int.Parse(FlightNo));
+    }
+
+    // Handle form submission to update flight details
+    private void HandleValidSubmit()
+    {
+        try
+        {
+            if (flight != null)
+            {
+                // Populate the form with existing flight details
+                flightInput.AirplaneId = flight.AirplaneId;
+                flightInput.ScheduledDepartureDate = (DateTime)date;
+            }
+            // Call the service to update the flight details (only AirplaneId and ScheduledDepartureDate)
+            compoundService.RescheduleFlight(int.Parse(FlightNo), flightInput.ScheduledDepartureDate, flightInput.AirplaneId);
+
+            // Redirect to the flight list page (or success page)
+            NavigationManager.NavigateTo("/"); // Or navigate to your flights list page
+        }
+        catch (Exception ex)
+        {
+            // Handle any errors during submission
+            Console.WriteLine($"Error updating flight: {ex.Message}");
+        }
+    }
+
+    // Return to the previous page (flight list or home)
+    private void ReturnToPreviousPage()
+    {
+        NavigationManager.NavigateTo("/"); // Navigate to the previous page (or home)
+    }
+}

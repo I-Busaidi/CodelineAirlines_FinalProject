@@ -1,0 +1,177 @@
+﻿@page "/ViewFlightToAdmin"
+
+@inject IFlightService flightService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudContainer Class="search-container">
+    <!-- Search Bar -->
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTextField Label="Search Flights"
+                          @bind-Value="searchQuery"
+                          Adornment="Adornment.Start"
+                          Icon="@Icons.Material.Filled.Search"
+                          FullWidth="true"
+                          Placeholder="Enter flight number or name..."
+                          OnKeyUp="HandleSearchKeyUp" />
+        </MudItem>
+    </MudGrid>
+
+    <!-- Search Button centered -->
+    <MudGrid Style="justify-content: center;" Class="mt-2">
+        <MudItem xs="4">
+            <!-- Using MudIconButton for search -->
+            <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Large" OnClick="OnSearchClicked" />
+        </MudItem>
+    </MudGrid>
+
+
+    <!-- Flight Expansion Panels (filtered by search query) -->
+    <MudExpansionPanels>
+        @foreach (var flight in filteredFlights)
+        {
+            <MudExpansionPanel Text="@($"Flight {flight.FlightNo}: {flight.SourceAirportName} -> {flight.DestinationAirportName} ~ Date: {flight.ScheduledDepartureDate:dd/MM/yyyy}")">
+                <MudCard Class="flight-card">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6"><strong>Flight Number:</strong> @flight.FlightNo</MudText>
+                        <MudText><strong>Source:</strong> @flight.SourceAirportName</MudText>
+                        <MudText><strong>Destination:</strong> @flight.DestinationAirportName</MudText>
+                        <MudText><strong>Departure Date:</strong> @flight.ScheduledDepartureDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
+                        <MudText><strong>Arrival Date:</strong> @flight.ScheduledArrivalDate.ToString("dd / MM / yyyy ~ HH:mm:ss")</MudText>
+                        <MudText><strong>Price:</strong> @flight.Cost OMR</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => EditFlight(flight))">Edit</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteFlight(flight))">Delete</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudExpansionPanel>
+        }
+    </MudExpansionPanels>
+    <!-- Action Buttons (Add New Flight and Return) -->
+    <MudGrid Style="justify-content: center;" Class="mt-4">
+        <MudItem xs="4" Class="mr-2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddNewFlight" FullWidth="true">
+                Add New Flight
+            </MudButton>
+        </MudItem>
+        <MudItem xs="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+                Return
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string searchQuery = string.Empty;
+    private List<FlightOutputDTO> flights = new List<FlightOutputDTO>();
+    private List<FlightOutputDTO> filteredFlights = new List<FlightOutputDTO>();
+
+    // Method to trigger search and filter the flights
+    private void OnSearchClicked()
+    {
+        FilterFlights();
+    }
+
+    // Handle Enter key press to trigger search
+    private void HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            FilterFlights();
+        }
+    }
+
+    private void FilterFlights()
+    {
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            filteredFlights = flights.Where(f => f.FlightNo.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                                  f.SourceAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                                  f.DestinationAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            filteredFlights = flights; // If search query is empty, show all flights
+        }
+    }
+
+    // Example methods for edit and delete
+    private void EditFlight(FlightOutputDTO flight)
+    {
+        // Implement editing functionality (e.g., open a form to edit the flight)
+        Console.WriteLine($"Editing flight: {flight.FlightNo}");
+    }
+
+    private void DeleteFlight(FlightOutputDTO flight)
+    {
+        // Implement delete functionality (e.g., confirm and delete the flight)
+        Console.WriteLine($"Deleting flight: {flight.FlightNo}");
+    }
+
+    // Load all flights when the component is initialized
+    protected override void OnInitialized()
+    {
+        flights = flightService.GetAllFlights(); // Get all flights from the service
+        filteredFlights = flights; // Show all flights initially
+    }
+
+    // Method to handle Add New Flight button click
+    private void AddNewFlight()
+    {
+        // Navigate to a page or open a form to add a new flight
+        NavigationManager.NavigateTo("/add-flight"); // Replace with your own route
+    }
+
+    // Method to handle Return button click
+    private void ReturnToPreviousPage()
+    {
+        NavigationManager.NavigateTo("/"); // Navigate to the previous page (or home)
+    }
+}
+
+<style>
+    .search-container {
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    .flight-card {
+        border: 2px solid #ddd; /* Adding a border around the card */
+        border-radius: 8px;
+        padding: 15px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .flight-card:hover {
+            transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+
+        .flight-card .mud-card-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .flight-card .mud-button {
+            width: 48%; /* Make buttons equal in width */
+        }
+
+    .mt-2 {
+        margin-top: 20px;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    /* Panel header customization */
+    .mud-expansion-panel-header {
+        background-color: #f5f5f5;
+        font-weight: bold;
+    }
+</style>
