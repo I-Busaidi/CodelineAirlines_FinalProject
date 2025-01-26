@@ -36,11 +36,7 @@ namespace CodelineAirlines.Mapping
             // Passenger related maps
             CreateMap<Passenger, PassengerOutputDTO>();
             // Map from PassengerInputDTOs to Passenger
-            CreateMap<PassengerInputDTOs, Passenger>()
-                .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => new DateOnly(src.BirthDate.Year, src.BirthDate.Month, src.BirthDate.Day)))
-                .ForMember(dest => dest.Passport, opt => opt.MapFrom(src => src.Passport))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))
-                .ForMember(dest => dest.Nationality, opt => opt.MapFrom(src => src.Nationality));
+            CreateMap<PassengerInputDTOs, Passenger>();
 
             //Map from ReviewInputDTO to Review 
             CreateMap<ReviewInputDTO, Review>();

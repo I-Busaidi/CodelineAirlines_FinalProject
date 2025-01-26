@@ -1,7 +1,7 @@
 ﻿@page "/signup"
 @inject NavigationManager NavManager
 @inject IUserService UserService
-
+@attribute [AllowAnonymous]
 <MudContainer MaxWidth="MaxWidth.Medium" Class="pa-6" Style="width: 600px;">
     <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Sign Up</MudText>
 

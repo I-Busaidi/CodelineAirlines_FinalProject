@@ -1,6 +1,7 @@
 ﻿@page "/flights"
 @inject IFlightService flightService
 @inject NavigationManager NavManager
+@attribute [AllowAnonymous]
 @using MudBlazor
 
 <MudContainer Class="carousel-container">
@@ -13,7 +14,7 @@
         </MudCarouselItem>
     </MudCarousel>
 </MudContainer>
-<MudContainer Style="align-content: center; background-color: transparent; z-index: auto; margin-top: -90px; padding: 20px; border-radius: 10px; border-color: aqua; border:solid;">
+<MudContainer Style="align-content: center; background-color: transparent; z-index: auto; margin-top: -150px; padding: 20px; border-radius: 10px; border-color: aqua; border:solid;">
 <MudExpansionPanels>
     @if (flights != null && flights.Any())
     {

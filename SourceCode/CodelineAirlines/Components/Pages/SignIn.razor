@@ -1,7 +1,10 @@
 ﻿@page "/signin"
 @inject NavigationManager NavManager
 @inject IUserService UserService
+@inject IAuthService authService
+@inject AuthState AuthState
 
+@attribute [AllowAnonymous]
 <MudContainer MaxWidth="MaxWidth.Medium" Class="pa-6" Style="width: 600px; background-color: rgba(255, 255, 255, 0.2); backdrop-filter:blur(15px); border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top:auto; margin-bottom:auto">
     <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Sign In</MudText>
 
@@ -44,10 +47,26 @@
             // Call the synchronous version of Login (assuming it's implemented in UserService)
             var result = UserService.login(signInModel.Email, signInModel.Password);
 
-            if (!string.IsNullOrWhiteSpace(result)) // Login success
+            if (result != null) // Login success
             {
-                NavManager.NavigateTo("/");
                 errorMessage = string.Empty; // Clear any previous error message
+                authService.GenerateToken(result);
+
+                if (result.UserRole == "superAdmin")
+                {
+                    AuthState.SetLoginState(true);
+                    NavManager.NavigateTo("/superAdminPortal", true);
+                }
+                else if (result.UserRole.ToLower() == "admin")
+                {
+                    AuthState.SetLoginState(true);
+                    NavManager.NavigateTo("/adminPortal", true);
+                }
+                else
+                {
+                    AuthState.SetLoginState(true);
+                    NavManager.NavigateTo("/", true);
+                }
             }
             else
             {

@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using MudBlazor.Services;
 using CodelineAirlines.Helpers;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CodelineAirlines
 {
@@ -81,9 +82,11 @@ namespace CodelineAirlines
             builder.Services.AddScoped<SeatSelectionService>();
             builder.Services.AddMudServices();
 
+            builder.Services.AddScoped<AppState>();
+            builder.Services.AddScoped<AuthState>();
             // Add JWT Authentication
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"];
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            builder.Services.AddSingleton(jwtSettings);
 
             builder.Services.AddAuthentication(options =>
             {
@@ -98,11 +101,19 @@ namespace CodelineAirlines
                     ValidateAudience = false, // You can set this to true if you want to validate the audience.
                     ValidateLifetime = true, // Ensures the token hasn't expired.
                     ValidateIssuerSigningKey = true, // Ensures the token is properly signed.
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) // Match with your token generation key.
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)) // Match with your token generation key.
                 };
             });
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("user", policy => policy.RequireRole("user"));
+                options.AddPolicy("admin", policy => policy.RequireRole("admin"));
+                options.AddPolicy("superAdmin", policy => policy.RequireRole("superAdmin"));
+            });
 
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             //builder.Services.AddEndpointsApiExplorer();
@@ -150,6 +161,7 @@ namespace CodelineAirlines
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();
             app.UseAntiforgery();
