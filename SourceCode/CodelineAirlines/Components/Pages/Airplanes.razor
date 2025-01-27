@@ -1,4 +1,4 @@
-﻿@page "/Airplanes"
+﻿@page "/1132456"
 @layout Layout.AdminLayout
 @inject IAirportService airportService
 @inject IAirplaneService airplaneService
@@ -45,14 +45,21 @@
         }
     </MudExpansionPanels>
 
+    <!-- Add Airplane Button -->
+    <MudCardContent>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToAddAirplanePage" FullWidth="true" Class="card-button">
+            Add Airplane
+        </MudButton>
+    </MudCardContent>
+
     <!-- Back Button -->
-    <MudGrid Style="justify-content: center;" Class="mt-4">
-        <MudItem xs="4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="NavigateToPreviousPage" FullWidth="true">
-                Return
-            </MudButton>
-        </MudItem>
-    </MudGrid>
+    <MudCardContent>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToPreviousPage" FullWidth="true" Class="card-button">
+            Return
+        </MudButton>
+    </MudCardContent>
+   
+
 </MudContainer>
 
 @code {
@@ -73,6 +80,11 @@
     {
         selectedAirportAirplanes = airplanes.Where(a => a.CurrentAirportId == airportId).ToList(); // Fetch airplanes for the selected airport
         selectedAirportId = airportId;
+    }
+    // Navigate to the Add Airplane page
+    private void NavigateToAddAirplanePage()
+    {
+        NavigationManager.NavigateTo($"/AddAirplane?airportId={selectedAirportId}");
     }
 
     // Navigate back to the previous page
