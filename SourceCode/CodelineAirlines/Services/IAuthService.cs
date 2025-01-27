@@ -7,5 +7,6 @@ namespace CodelineAirlines.Services
     {
         JwtTokenResponse GenerateToken(User user);
         Task SaveTokenToCookie(string token);
+        Task Logout();
     }
 }

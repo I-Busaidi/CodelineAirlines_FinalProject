@@ -1,9 +1,9 @@
 ﻿@page "/AdminHomePage"
-@inject IAirportService airportService
-@inject IAirplaneService airplaneService
-@inject IFlightService flightService
+@layout Layout.AdminLayout
 @inject NavigationManager NavigationManager
-@using MudBlazor
+@attribute [Authorize(Roles = "admin")]
+
+
 
 <MudContainer Class="admin-dashboard-container">
     <MudText Typo="Typo.h3" Align="Align.Center" Class="title mt-4">Admin Dashboard</MudText>

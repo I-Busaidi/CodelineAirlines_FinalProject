@@ -1,8 +1,10 @@
 ﻿@page "/ViewFlightToAdmin"
-
+@layout Layout.AdminLayout
 @inject IFlightService flightService
 @inject NavigationManager NavigationManager
 @using MudBlazor
+
+@attribute [Authorize(Roles = "admin")]
 
 <MudContainer Class="search-container">
     <!-- Search Bar -->

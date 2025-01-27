@@ -64,5 +64,13 @@ namespace CodelineAirlines.Services
             await _jsRuntime.InvokeVoidAsync("eval", $"document.cookie = 'authToken={token}; {cookieOptions.ToString()}';");
         }
 
+        public async Task Logout()
+        {
+            // Remove the token from the cookie
+            await _jsRuntime.InvokeVoidAsync("eval", "document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'");
+
+            // Mark the user as logged out
+            ((CustomAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
+        }
     }
 }

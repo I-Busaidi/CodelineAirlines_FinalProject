@@ -1,8 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject IHttpContextAccessor HttpContextAccessor
-@inject IAuthService authService
 @inject IUserService userService
-@inject AuthState AuthState
+@inject IAuthService authService
 @inject NavigationManager NavManager
 @* Required *@
 <MudThemeProvider />
@@ -17,14 +16,14 @@
 <MudLayout>
     <MudAppBar Elevation="0" Style="background-color: transparent; position: fixed; z-index: 10;">
         <MudContainer Style="display: flex; background-color: rgba(0, 0, 0, 0.4); border-radius: 5px; backdrop-filter:blur(5px); justify-items: center; align-items: center; height: 60px;">
-            <a href="/"><MudImage Src="codeline-airlines-logo-no_background.png" Style="height: 55px; width: 75px; background-color:rgba(255, 255, 255, 0.09); border-radius: 10px"></MudImage></a>
-            <MudText Typo="Typo.h5" Class="ml-3" Color="Color.Default" Style="font-family: Consolas;">CODELINE AIRLINES</MudText>
+            <a href="/AdminHomePage"><MudImage Src="codeline-airlines-logo-no_background.png" Style="height: 55px; width: 75px; background-color:rgba(255, 255, 255, 0.09); border-radius: 10px"></MudImage></a>
+            <MudText Typo="Typo.h5" Class="ml-3" Color="Color.Default" Style="font-family: Consolas;">CODELINE AIRLINES / ADMIN</MudText>
             <MudSpacer />
             <MudButtonGroup Variant="Variant.Text" Style="justify-content: space-evenly">
 
-                    <MudButton Href="/bookings" Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.AirplaneTicket"></MudIcon> &nbsp; Bookings</MudButton>
-                    <MudButton Href="/Profile" Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.AccountCircle"></MudIcon> &nbsp; @user.Name</MudButton>
-                    <MudButton Style="color: white; background-color: rgba(255, 255, 255, 0.09)" OnClick="SignOut"><MudIcon Icon="@Icons.Material.Outlined.Logout"></MudIcon> &nbsp; Logout</MudButton>
+
+                <MudButton Style="color: white; background-color: rgba(255, 255, 255, 0.09)"><MudIcon Icon="@Icons.Material.Outlined.AccountCircle"></MudIcon> &nbsp;Welcome, @user.Name</MudButton>
+                <MudButton Style="color: white; background-color: rgba(255, 255, 255, 0.09)" OnClick="SignOut"><MudIcon Icon="@Icons.Material.Outlined.Logout"></MudIcon> &nbsp; Logout</MudButton>
 
 
             </MudButtonGroup>
@@ -42,7 +41,6 @@
     UserOutputDTO user = new UserOutputDTO();
     protected override void OnInitialized()
     {
-        AuthState.OnChange += RefreshLayout;
         Token = HttpContextAccessor.HttpContext?.Request.Cookies["authToken"];
         if (!string.IsNullOrWhiteSpace(Token))
         {
@@ -57,18 +55,9 @@
             }
         }
     }
-    private void RefreshLayout()
-    {
-        InvokeAsync(StateHasChanged);
-    }
-    public void Dispose()
-    {
-        AuthState.OnChange -= RefreshLayout;
-    }
 
     private async Task SignOut()
     {
-        AuthState.SetLoginState(false);
         await authService.Logout();
         NavManager.NavigateTo("/", true);
     }

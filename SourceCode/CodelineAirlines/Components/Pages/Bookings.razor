@@ -2,6 +2,8 @@
 @inject NavigationManager NavManager
 @inject IBookingService BookingService
 
+@attribute [Authorize(Roles = "user")]
+
 <MudContainer MaxWidth="MaxWidth.Large" Class="pa-6">
     <MudText Typo="Typo.h4" Class="mb-6 text-center">Your Bookings</MudText>
 
