@@ -1,4 +1,4 @@
-﻿@page "/AdminHomePage"
+﻿@page "/"
 @layout Layout.AdminLayout
 @inject NavigationManager NavigationManager
 @* @attribute [Authorize(Roles = "admin")] *@
@@ -43,14 +43,6 @@
                     </MudButton>
                 </MudCardContent>
             </MudCard>
-        </MudItem>
-    </MudGrid>
-
-    <MudGrid Style="justify-content: center;" Class="mt-4">
-        <MudItem xs="4" Class="mr-2">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ReturnToHomePage" FullWidth="true" Class="return-button">
-                Return to Home
-            </MudButton>
         </MudItem>
     </MudGrid>
 </MudContainer>

@@ -1,0 +1,107 @@
+﻿@page "/1132456"
+@layout Layout.AdminLayout
+@inject IAirportService airportService
+@inject IAirplaneService airplaneService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+@attribute [Authorize(Roles = "admin")]
+
+<MudContainer Class="airplanes-container">
+    <!-- Dropdown to Select an Airport -->
+    <MudGrid>
+        <MudItem xs="12">
+            <MudSelect T="int" Label="Select Airport" FullWidth="true" ValueChanged="LoadAirplanes">
+                @foreach (var airport in airports)
+                {
+                    <MudSelectItem Value="@airport.AirportId">@airport.AirportName (@airport.City)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Display Airplanes for Selected Airport -->
+    <MudExpansionPanels Class="mt-4">
+        @if (selectedAirportAirplanes != null && selectedAirportAirplanes.Any())
+        {
+            @foreach (var airplane in selectedAirportAirplanes)
+            {
+                <MudExpansionPanel Text="@airplane.AirplaneModel">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudText Typo="Typo.body1">
+                                <strong>Model:</strong> @airplane.AirplaneModel<br />
+                                
+                                <strong>Manufacturer:</strong> @airplane.ManufactureDate
+                            </MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudExpansionPanel>
+            }
+        }
+        else if (selectedAirportId != null)
+        {
+            <MudText Typo="Typo.body2">No airplanes available for the selected airport.</MudText>
+        }
+    </MudExpansionPanels>
+
+    <!-- Add Airplane Button -->
+    <MudCardContent>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToAddAirplanePage" FullWidth="true" Class="card-button">
+            Add Airplane
+        </MudButton>
+    </MudCardContent>
+
+    <!-- Back Button -->
+    <MudCardContent>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToPreviousPage" FullWidth="true" Class="card-button">
+            Return
+        </MudButton>
+    </MudCardContent>
+   
+
+</MudContainer>
+
+@code {
+    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
+    private List<AirplaneOutputDto> airplanes = new List<AirplaneOutputDto>();
+    private List<AirplaneOutputDto> selectedAirportAirplanes = new List<AirplaneOutputDto>();
+    private int selectedAirportId;
+
+    // Load all airports on initialization
+    protected override void OnInitialized()
+    {
+        airports = airportService.GetAllAirports(); // Fetch all airports from the service
+        airplanes = airplaneService.GetAll();
+    }
+
+    // Load airplanes for the selected airport
+    private void LoadAirplanes(int airportId)
+    {
+        selectedAirportAirplanes = airplanes.Where(a => a.CurrentAirportId == airportId).ToList(); // Fetch airplanes for the selected airport
+        selectedAirportId = airportId;
+    }
+    // Navigate to the Add Airplane page
+    private void NavigateToAddAirplanePage()
+    {
+        NavigationManager.NavigateTo($"/AddAirplane?airportId={selectedAirportId}");
+    }
+
+    // Navigate back to the previous page
+    private void NavigateToPreviousPage()
+    {
+        NavigationManager.NavigateTo("/AirportManagement");
+    }
+}
+
+<style>
+    .airplanes-container {
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+</style>

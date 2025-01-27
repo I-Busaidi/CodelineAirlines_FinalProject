@@ -1,0 +1,79 @@
+﻿@page "/AddAirplanes"
+@inject IAirportService airportService
+@inject IAirplaneService airplaneService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudContainer Class="form-container">
+    <MudGrid>
+        <!-- Airplane Model -->
+        <MudItem xs="12">
+            <MudTextField @bind-Value="model" Label="Model" Variant="Variant.Outlined" Required="true" />
+        </MudItem>
+
+        <!-- Select Airport -->
+        <MudItem xs="12">
+            <MudSelect T="int" Label="Select Airport" FullWidth="true" @bind-Value="selectedAirportId" Required="true">
+                @foreach (var airport in airports)
+                {
+                    <MudSelectItem Value="@airport.AirportId">@airport.AirportName (@airport.City)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <!-- Seat Template Placeholder -->
+        <MudItem xs="12">
+            <MudText Typo="Typo.subtitle1">Seat Template Configuration:</MudText>
+            <MudText Typo="Typo.body2">Seat template details will go here (to be implemented).</MudText>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Action Buttons -->
+    <MudGrid Class="mt-4" Style="justify-content: space-between;">
+        <MudItem xs="4">
+            <MudButton OnClick="NavigateToPreviousPage" Color="Color.Secondary" FullWidth="true">Return</MudButton>
+        </MudItem>
+        <MudItem xs="4">
+            <MudButton  Color="Color.Primary" FullWidth="true">Submit</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string model;
+    private GenerateSeatTemplateDto seatTemplate = new GenerateSeatTemplateDto();
+    private int selectedAirportId;
+    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            // Fetch all airports
+            airports = airportService.GetAllAirports();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error fetching airports: " + ex.Message);
+           
+        }
+    }
+
+  
+    private void NavigateToPreviousPage()
+    {
+        NavigationManager.NavigateTo("/"); // Navigate back to the previous page
+    }
+}
+
+<style>
+    .form-container {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+</style>

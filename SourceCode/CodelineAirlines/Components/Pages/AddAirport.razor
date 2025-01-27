@@ -1,0 +1,105 @@
+﻿@page "/AddAirport"
+@layout Layout.AdminLayout
+@inject IAirportService airportService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudContainer Class="add-airport-container">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h4" Class="mb-4">Add New Airport</MudText>
+        </MudItem>
+
+        <!-- Airport Name Input -->
+        <MudItem xs="12" md="6">
+            <MudTextField Label="Airport Name"
+                          @bind-Value="airportName"
+                          Placeholder="Enter airport name"
+                          FullWidth="true" />
+        </MudItem>
+
+        <!-- City Input -->
+        <MudItem xs="12" md="6">
+            <MudTextField Label="City"
+                          @bind-Value="city"
+                          Placeholder="Enter city name"
+                          FullWidth="true" />
+        </MudItem>
+
+        <!-- Action Buttons -->
+        <MudItem xs="12" Class="mt-4" Style="display: flex; justify-content: space-between;">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddAirports">
+                Add Airport
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">
+                Cancel
+            </MudButton>
+        </MudItem>
+
+        <!-- Error Message -->
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <MudItem xs="12" Class="mt-2">
+                <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string airportName = string.Empty;
+    private string city = string.Empty;
+    private string errorMessage = string.Empty;
+
+    // Add new airport
+    private void AddAirports()
+    {
+        if (string.IsNullOrWhiteSpace(airportName) || string.IsNullOrWhiteSpace(city))
+        {
+            errorMessage = "Both fields are required.";
+            return;
+        }
+
+        try
+        {
+            var newAirport = new AirportInputDTO
+                {
+                    AirportName = airportName,
+                    City = city
+                };
+
+            airportService.AddAirport(newAirport); // Call service to add airport
+            NavigationManager.NavigateTo("/AirportManagement"); // Redirect to management page
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error adding airport: {ex.Message}";
+        }
+    }
+
+    // Navigate back to the airport management page
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/AirportManagement");
+    }
+}
+
+<style>
+    .add-airport-container {
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    .mb-4 {
+        margin-bottom: 16px;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    .mt-2 {
+        margin-top: 10px;
+    }
+</style>
