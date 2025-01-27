@@ -1,0 +1,177 @@
+﻿@page "/AirportManagement"
+@layout Layout.AdminLayout
+@inject IAirportService airportService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+
+@attribute [Authorize(Roles = "admin")]
+
+<MudContainer Class="search-container">
+    <!-- Search Bar -->
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTextField Label="Search Airports"
+                          @bind-Value="searchQuery"
+                          Adornment="Adornment.Start"
+                          Icon="@Icons.Material.Filled.Search"
+                          FullWidth="true"
+                          Placeholder="Enter airport name or code..."
+                          OnKeyUp="HandleSearchKeyUp" />
+        </MudItem>
+    </MudGrid>
+
+    <!-- Search Button -->
+    <MudGrid Style="justify-content: center;" Class="mt-2">
+        <MudItem xs="4">
+            <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Large" OnClick="OnSearchClicked" />
+        </MudItem>
+    </MudGrid>
+
+    <!-- Airport Expansion Panels (filtered by search query) -->
+    <MudExpansionPanels>
+        @foreach (var airport in filteredAirports)
+        {
+            <MudExpansionPanel Text="@($"{airport.AirportName} ({airport.AirportId}) - Location: {airport.City}")">
+                <MudCard Class="airport-card">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6"><strong>Airport Name:</strong> @airport.AirportName</MudText>
+                        <MudText><strong>Code:</strong> @airport.AirportId</MudText>
+                        <MudText><strong>Location:</strong> @airport.City</MudText>
+                        <MudText><strong>Country:</strong> @airport.Country</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteAirport(airport))">
+                            Delete
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudExpansionPanel>
+        }
+    </MudExpansionPanels>
+
+    <!-- Action Buttons (Add New Airport and Return) -->
+    <MudGrid Style="justify-content: center;" Class="mt-4">
+        <MudItem xs="4" Class="mr-2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddNewAirport" FullWidth="true">
+                Add New Airport
+            </MudButton>
+        </MudItem>
+        <MudItem xs="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+                Return
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string searchQuery = string.Empty;
+    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
+    private List<AirportOutputDTO> filteredAirports = new List<AirportOutputDTO>();
+
+    // Trigger search when search button is clicked
+    private void OnSearchClicked()
+    {
+        FilterAirports();
+    }
+
+    // Handle Enter key press to trigger search
+    private void HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            FilterAirports();
+        }
+    }
+
+    // Filter airports based on the search query
+    private void FilterAirports()
+    {
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            filteredAirports = airports.Where(a => a.AirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                                    a.AirportId.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)||
+                                                    a.City.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)||
+                                                    a.Country.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            filteredAirports = airports; // Show all airports if search query is empty
+        }
+    }
+
+    // Example method to delete an airport
+    private void DeleteAirport(AirportOutputDTO airport)
+    {
+        try
+        {
+            airportService.DeleteAirport(airport.AirportId); // Call the service to delete the airport by its code
+            airports.Remove(airport); // Remove the airport from the list
+            FilterAirports(); // Update the filtered list
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting airport: {ex.Message}");
+        }
+    }
+
+    // Navigate to the Add New Airport page
+    private void AddNewAirport()
+    {
+        NavigationManager.NavigateTo("/AddAirport"); // Replace with the route to your Add Airport page
+    }
+
+    // Return to the previous page
+    private void ReturnToPreviousPage()
+    {
+        NavigationManager.NavigateTo("/"); // Navigate to the home page or previous page
+    }
+
+    // Load airports when the page is initialized
+    protected override void OnInitialized()
+    {
+        airports = airportService.GetAllAirports(); // Fetch the list of airports from the service
+        filteredAirports = airports; // Show all airports initially
+    }
+}
+
+<style>
+    .search-container {
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    .airport-card {
+        border: 2px solid #ddd; /* Add a border around the card */
+        border-radius: 8px;
+        padding: 15px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .airport-card:hover {
+            transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+
+        .airport-card .mud-card-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+    .mt-2 {
+        margin-top: 20px;
+    }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    /* Panel header customization */
+    .mud-expansion-panel-header {
+        background-color: #f5f5f5;
+        font-weight: bold;
+    }
+</style>
