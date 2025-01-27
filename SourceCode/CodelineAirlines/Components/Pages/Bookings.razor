@@ -1,7 +1,10 @@
 ﻿@page "/bookings"
 @inject NavigationManager NavManager
 @inject IBookingService BookingService
-
+@inject IPassengerService passengerService
+@inject IUserService userService
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IAuthService authService
 @attribute [Authorize(Roles = "user")]
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="pa-6">
@@ -42,12 +45,29 @@
 </MudContainer>
 
 @code {
-    private List<Booking> bookings;
-
+    public int userId { get; set; }
+    private List<Booking> bookings = new List<Booking>();
+    private List<PassengerOutputDTO> passengers = new List<PassengerOutputDTO>();
+    private string? Token;
     protected override void OnInitialized()
     {
-        // Fetch bookings for the logged-in user
-        bookings = BookingService.GetBookingsForPassenger("123123").ToList(); // Replace "123123" with the actual user ID
+        Token = HttpContextAccessor.HttpContext?.Request.Cookies["authToken"];
+        if (!string.IsNullOrWhiteSpace(Token))
+        {
+            var claims = JwtHelper.GetClaimsFromToken(Token);
+            if (claims != null)
+            {
+                userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+
+                passengers = passengerService.GetPassengerProfile(userId);
+
+                foreach(var passenger in passengers)
+                {
+                    bookings.AddRange(BookingService.GetBookingsForPassenger(passenger.Passport));
+                }
+            }
+        }
     }
 
     private string GetBookingStatus(int status)
@@ -66,18 +86,18 @@
         try
         {
             // Call the service to delete the booking
-             BookingService.CancelBooking(bookingId);
+            BookingService.CancelBooking(bookingId);
 
             // Optionally refresh the bookings list
-            bookings = BookingService.GetBookingsForPassenger("123123").ToList();
-
-            // Navigate back to the flights page
-            NavManager.NavigateTo("/flights");
+            foreach (var passenger in passengers)
+            {
+                bookings.AddRange(BookingService.GetBookingsForPassenger(passenger.Passport));
+            }
         }
         catch (Exception ex)
         {
             // Handle any errors (e.g., log or display an error message)
-            Console.WriteLine($"Error deleting booking: {ex.Message}");
+            Log.Error($"Error deleting booking: {ex.Message}");
         }
     }
 }

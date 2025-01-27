@@ -12,6 +12,10 @@ namespace CodelineAirlines.DTOs.UserDTOs
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Email must be in a valid format.")]
         public string UserEmail { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string UserPhoneNumber { get; set; }
+
         [Required( ErrorMessage = "Email is required.")]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must be at least 8 characters long, with at least one letter and one number.")]
         public string Password { get; set; }

@@ -5,10 +5,10 @@
 
 @code {
     string message = "";
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        var authState = AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.Result.User;
 
         if (!user.Identity.IsAuthenticated)
         {

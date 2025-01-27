@@ -19,6 +19,10 @@ namespace CodelineAirlines.Models
         [StringLength(50, ErrorMessage = "Email must not exceed 50 characters")]
         public string UserEmail { get; set; }
 
+        [Required]
+        [StringLength(20)]
+        public string UserPhoneNumber { get; set; }
+
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
 

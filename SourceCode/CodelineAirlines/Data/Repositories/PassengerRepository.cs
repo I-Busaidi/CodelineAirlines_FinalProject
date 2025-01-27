@@ -45,7 +45,6 @@ namespace CodelineAirlines.Repositories
             if (existingPassenger != null)
             {
                 // Update the passenger properties
-                existingPassenger.Passport = passenger.Passport;
                 existingPassenger.Gender = passenger.Gender;
                 existingPassenger.BirthDate = passenger.BirthDate;
                 existingPassenger.Nationality = passenger.Nationality;

@@ -3,6 +3,7 @@ using CodelineAirlines.DTOs.PassengerDTOs;
 using CodelineAirlines.Models;
 using CodelineAirlines.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace CodelineAirlines.Services
 {
@@ -35,11 +36,7 @@ namespace CodelineAirlines.Services
                 throw new UnauthorizedAccessException("You are not authorized to create a passenger profile for this user.");
             }
 
-            // Check if the user already has a passenger profile
-            if (_passengerRepository.PassengerExistsForUser(userId))
-            {
-                throw new InvalidOperationException("A passenger profile already exists for this user.");
-            }
+            
 
             // Map the DTO to the Passenger entity
             var passenger = _mapper.Map<Passenger>(passengerInputDTO);
@@ -75,11 +72,11 @@ namespace CodelineAirlines.Services
   
             return _passengerRepository.GetLoyaltyPointsByUserId(userId);
         }
-        public Passenger GetPassengerByPassport(string passport)
+        public Passenger? GetPassengerByPassport(string passport)
         {
             if (string.IsNullOrEmpty(passport))
             {
-                throw new ArgumentException("Passport number cannot be null or empty.", nameof(passport));
+                Log.Error($"Passenger not found: passport number not provided");
             }
 
             // Retrieve the passenger from the repository
@@ -87,7 +84,7 @@ namespace CodelineAirlines.Services
 
             if (passenger == null)
             {
-                throw new KeyNotFoundException($"Passenger with passport {passport} not found.");
+                Log.Error($"Passenger not found: passport {passport}");
             }
 
             return passenger;

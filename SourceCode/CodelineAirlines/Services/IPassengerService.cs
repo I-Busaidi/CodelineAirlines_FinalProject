@@ -9,7 +9,7 @@ namespace CodelineAirlines.Services
         List<PassengerOutputDTO> GetPassengerProfile(int userId);
         void UpdatePassengerDetails(int userId, PassengerInputDTOs passengerInputDTO);
         int GetLoyaltyPoints(int userId);
-        Passenger GetPassengerByPassport(string passport);
+        Passenger? GetPassengerByPassport(string passport);
 
     }
 }

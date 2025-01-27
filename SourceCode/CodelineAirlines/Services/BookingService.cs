@@ -87,21 +87,8 @@ namespace CodelineAirlines.Services
             decimal baseCost = flight.Cost; // Use the flight's base cost
 
             // Calculate the class cost based on the selected class
-            decimal classCost = 0;
-            switch (bookingDto.Class.ToLower())
-            {
-                case "economy":
-                    classCost = baseCost * EconomyClassPercentage;
-                    break;
-                case "business":
-                    classCost = baseCost * BusinessClassPercentage;
-                    break;
-                case "first":
-                    classCost = baseCost * FirstClassPercentage;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid class selected.");
-            }
+            decimal classCost = baseCost;
+            
 
             // Calculate the total cost
             decimal totalCost = baseCost + classCost;
@@ -159,8 +146,7 @@ namespace CodelineAirlines.Services
             // Save the updated passenger with the reduced loyalty points
             _passengerRepository.UpdatePassenger(passenger);
 
-            // Send booking confirmation email with loyalty points and discount details
-            SendBookingConfirmationEmail(bookingId, bookingDto.LoyaltyPointsToUse, loyaltyPointsValue);
+            
 
             return true;
         }

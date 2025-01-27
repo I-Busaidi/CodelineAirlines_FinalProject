@@ -11,6 +11,7 @@ using System.Text;
 using MudBlazor.Services;
 using CodelineAirlines.Helpers;
 using Microsoft.AspNetCore.Components.Authorization;
+using Serilog;
 
 namespace CodelineAirlines
 {
@@ -50,7 +51,10 @@ namespace CodelineAirlines
             builder.Services.AddScoped<ISeatTemplateService, SeatTemplateService>();
 
             // adding email service
-            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddSingleton<ISmsService, SmsService>();
+
+            // adding email service
+            builder.Services.AddSingleton<IEmailService, EmailService>();
 
             //adding review related services
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
@@ -74,11 +78,12 @@ namespace CodelineAirlines
             builder.Services.AddScoped<SourceAirportNameResolver>();
             builder.Services.AddScoped<DestinationAirportNameResolver>();
 
+            builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents();
 
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddHttpClient<WeatherService>(); // Used for weather forecast.
-            //builder.Services.AddControllers();
             builder.Services.AddScoped<SeatSelectionService>();
             builder.Services.AddMudServices();
 
@@ -104,7 +109,8 @@ namespace CodelineAirlines
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)) // Match with your token generation key.
                 };
             });
-
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("user", policy => policy.RequireRole("user"));
@@ -112,48 +118,27 @@ namespace CodelineAirlines
                 options.AddPolicy("superAdmin", policy => policy.RequireRole("superAdmin"));
             });
 
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyMethod();
+                    builder.AllowAnyHeader();
+                });
+            });
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            //builder.Services.AddEndpointsApiExplorer();
-            //builder.Services.AddSwaggerGen(c =>
-            //{
-            //    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            //    {
-            //        Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer <token>')",
-            //        Name = "Authorization",
-            //        In = ParameterLocation.Header,
-            //        Type = SecuritySchemeType.ApiKey,
-            //        Scheme = "Bearer"
-            //    });
-
-            //    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            //    {
-            //        {
-            //            new OpenApiSecurityScheme
-            //            {
-            //                Reference = new OpenApiReference
-            //                {
-            //                    Type = ReferenceType.SecurityScheme,
-            //                    Id = "Bearer"
-            //                }
-            //            },
-            //            new string[] {}
-            //        }
-            //    });
-            //});
-
-            builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .CreateLogger();
+            builder.Host.UseSerilog();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                //app.UseSwagger();
-                //app.UseSwaggerUI();
 
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -161,11 +146,14 @@ namespace CodelineAirlines
             }
 
             app.UseHttpsRedirection();
+            //app.UseRouting();
+            app.UseSerilogRequestLogging();
+
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();
             app.UseAntiforgery();
-            //app.MapControllers();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 

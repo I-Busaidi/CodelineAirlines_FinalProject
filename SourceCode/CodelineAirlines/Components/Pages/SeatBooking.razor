@@ -27,7 +27,7 @@
                 </MudList>
             </MudCardContent>
             <MudCardActions Style="align-self: center;">
-                <MudButton Color="Color.Primary" OnClick="@ConfirmSeats">Confirm</MudButton>
+                <MudButton Color="Color.Primary" OnClick="@ConfirmSeats" Disabled = "@notValidSeats">Confirm</MudButton>
                 <MudButton Color="Color.Secondary" OnClick="@GoBack">Return</MudButton>
             </MudCardActions>
         </MudCard>
@@ -136,7 +136,7 @@
     private List<SeatTemplate> selectedSeats = new(); // Stores selected seats
     private int flightNo { get; set; }
     private Airplane airplane { get; set; }
-
+    private bool notValidSeats = true;
     private AirplaneSpecs airplaneSpecs { get; set; }
     private List<SeatTemplate> seats = new List<SeatTemplate>();
     private List<(SeatTemplate seat, bool status)> seatStatuses = new List<(SeatTemplate seat, bool status)>();
@@ -217,11 +217,26 @@
     {
         if (status)
         {
-            selectedSeats.Add(seat);
+            if (selectedSeats.Count < appState.PassengersInput.Count)
+            {
+                selectedSeats.Add(seat);
+            }
         }
         else
         {
             selectedSeats.RemoveAll(s => s.SeatNumber == seat.SeatNumber);
+            if(selectedSeats.Count < 1)
+            {
+                drawerOpen = false;
+            }
+        }
+        if (selectedSeats.Count == appState.PassengersInput.Count)
+        {
+            notValidSeats = false;
+        }
+        else
+        {
+            notValidSeats = true;
         }
         drawerOpen = true; // Open drawer when seats are selected
     }
@@ -234,12 +249,12 @@
     private void ConfirmSeats()
     {
         SeatSelectionService.SetSelectedSeats(selectedSeats);
-        NavigationManager.NavigateTo("/nextpage");
+        NavigationManager.NavigateTo($"/confirmBooking/{flightNo}");
     }
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/previouspage");
+        NavigationManager.NavigateTo("/flights");
     }
 
     private string GetSeatClass(int seatLocation)
@@ -257,7 +272,7 @@
 
 <style>
     body {
-        background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('/images/background.jpg');
+        background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('/images/background5.jpg');
         background-size: cover;
         background-position: center;
         height: 100vh;
@@ -268,7 +283,7 @@
         width: 18%;
         height: 90%;
         top: 75px;
-        left: 275px;
+        left: 25px;
         background-color: rgba(255, 255, 255, 0.9);
         border-radius: 10px;
         padding: 10px;
@@ -286,15 +301,15 @@
         position: fixed !important;
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
-        margin-left: 20%;
-        margin-right: 200px;
+        left: 25%;
+        right: 25%;
         backdrop-filter: blur(15px);
         color: black;
         padding: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         overflow-y: auto;
         height: 90%;
-        width: 46%;
+        width: 50%;
     }
     .seat-layout 
     {

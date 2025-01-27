@@ -93,6 +93,12 @@
     private List<PassengerInputDTOs> passengerList = new();
     private bool isPassengerListEmpty = true;
 
+    protected override void OnInitialized()
+    {
+        appState.PassengersInput.Clear();
+        appState.SelectedSeats.Clear();
+    }
+
     private void AddPassenger(EditContext context)
     {
         success = true;
