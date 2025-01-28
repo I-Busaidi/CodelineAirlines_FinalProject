@@ -13,8 +13,10 @@
     <!-- Flexbox Layout -->
     <div class="d-flex justify-content-between align-items-start" style="min-height: 100vh;">
         <!-- Left: Passenger Information Form (Smaller Size) -->
-        <MudPaper Class="pa-4 mb-8 w-40" Elevation="4" Style="height: 100%;">
-            <EditForm Model="@model" OnValidSubmit="AddPassenger">
+        <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+            <MudTabPanel Text="Tab One">
+                <MudPaper Class="pa-4 mb-8 w-40" Elevation="4" Style="height: 100%;">
+                <EditForm Model="@model" OnValidSubmit="AddPassenger">
                 <DataAnnotationsValidator />
                 <MudText Typo="Typo.h5" Class="mb-4">Passenger Information</MudText>
 
@@ -45,8 +47,12 @@
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
                 </MudItem>
             </EditForm>
-        </MudPaper>
-
+            </MudPaper>
+            </MudTabPanel>
+            <MudTabPanel Text="Tab Disabled" Disabled="false">
+                <MudText>Content Disabled</MudText>
+            </MudTabPanel>
+        </MudTabs>
         <!-- Right: Passenger List -->
         <div class="w-50" style="max-height: 80vh; overflow-y: auto;">
             <MudText Typo="Typo.h5" Class="mb-4 text-center">Passengers</MudText>
