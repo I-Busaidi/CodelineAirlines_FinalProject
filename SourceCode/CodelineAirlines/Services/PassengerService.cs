@@ -76,7 +76,7 @@ namespace CodelineAirlines.Services
         {
             if (string.IsNullOrEmpty(passport))
             {
-                Log.Error($"Passenger not found: passport number not provided");
+                throw new ArgumentNullException($"Passenger not found: passport number not provided");
             }
 
             // Retrieve the passenger from the repository
@@ -84,7 +84,7 @@ namespace CodelineAirlines.Services
 
             if (passenger == null)
             {
-                Log.Error($"Passenger not found: passport {passport}");
+                throw new KeyNotFoundException($"Passenger not found: passport {passport}");
             }
 
             return passenger;

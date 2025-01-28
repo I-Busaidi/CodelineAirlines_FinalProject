@@ -112,7 +112,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting airport: {ex.Message}");
+            Log.Error($"Error deleting airport: {ex.Message}");
         }
     }
 
@@ -125,7 +125,7 @@
     // Return to the previous page
     private void ReturnToPreviousPage()
     {
-        NavigationManager.NavigateTo("/"); // Navigate to the home page or previous page
+        NavigationManager.NavigateTo("/AdminHomePage"); // Navigate to the home page or previous page
     }
 
     // Load airports when the page is initialized

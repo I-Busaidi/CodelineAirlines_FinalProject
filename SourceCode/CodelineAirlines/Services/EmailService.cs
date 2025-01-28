@@ -32,7 +32,7 @@ namespace CodelineAirlines.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending email");
-                throw;
+                throw new Exception();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿@page "/EditFlight"
+﻿@page "/EditFlight/{FlightNo}"
 @layout Layout.AdminLayout
 @inject IFlightService flightService
 @inject ICompoundService compoundService
@@ -49,7 +49,7 @@
 </MudContainer>
 
 @code {
-    [Parameter] public string FlightNo { get; set; } = "1";
+    [Parameter] public string FlightNo { get; set; }
     private DateTime? date = null;
     private FlightInputDTO flightInput = new FlightInputDTO();
     private MudForm flightForm;
@@ -75,18 +75,18 @@
             compoundService.RescheduleFlight(int.Parse(FlightNo), flightInput.ScheduledDepartureDate, flightInput.AirplaneId);
 
             // Redirect to the flight list page (or success page)
-            NavigationManager.NavigateTo("/"); // Or navigate to your flights list page
+            NavigationManager.NavigateTo("/ViewFlightToAdmin"); 
         }
         catch (Exception ex)
         {
             // Handle any errors during submission
-            Console.WriteLine($"Error updating flight: {ex.Message}");
+            Log.Error($"Error updating flight: {ex.Message}");
         }
     }
 
     // Return to the previous page (flight list or home)
     private void ReturnToPreviousPage()
     {
-        NavigationManager.NavigateTo("/"); // Navigate to the previous page (or home)
+        NavigationManager.NavigateTo("/ViewFlightToAdmin"); // Navigate to the previous page (or home)
     }
 }

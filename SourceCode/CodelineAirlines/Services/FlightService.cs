@@ -34,7 +34,10 @@ namespace CodelineAirlines.Services
             var flights = _flightRepository.GetAllFlights()
                 .OrderBy(f => f.StatusCode)
                 .ToList();
-
+            if (flights == null || flights.Count == 0)
+            {
+                throw new InvalidOperationException("No flights found");
+            }
             return flights;
         }
 
@@ -57,7 +60,10 @@ namespace CodelineAirlines.Services
             var flights = _flightRepository.GetAllFlights()
                 .Where(f => f.ScheduledDepartureDate >=  startDate && f.ScheduledArrivalDate <= endDate)
                 .ToList();
-
+            if (flights == null || flights.Count == 0)
+            {
+                throw new InvalidOperationException("No flights found");
+            }
             return flights;
         }
 

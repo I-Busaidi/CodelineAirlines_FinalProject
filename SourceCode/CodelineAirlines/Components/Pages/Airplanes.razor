@@ -1,4 +1,4 @@
-﻿@page "/1132456"
+﻿@page "/manageAirplanes"
 @layout Layout.AdminLayout
 @inject IAirportService airportService
 @inject IAirplaneService airplaneService
@@ -84,13 +84,13 @@
     // Navigate to the Add Airplane page
     private void NavigateToAddAirplanePage()
     {
-        NavigationManager.NavigateTo($"/AddAirplane?airportId={selectedAirportId}");
+        NavigationManager.NavigateTo($"/AddAirplanes");
     }
 
     // Navigate back to the previous page
     private void NavigateToPreviousPage()
     {
-        NavigationManager.NavigateTo("/AirportManagement");
+        NavigationManager.NavigateTo("/AdminHomePage");
     }
 }
 

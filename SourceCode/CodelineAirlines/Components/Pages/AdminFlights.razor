@@ -104,13 +104,13 @@
     private void EditFlight(FlightOutputDTO flight)
     {
         // Implement editing functionality (e.g., open a form to edit the flight)
-        Console.WriteLine($"Editing flight: {flight.FlightNo}");
+        Log.Debug($"Editing flight: {flight.FlightNo}");
     }
 
     private void DeleteFlight(FlightOutputDTO flight)
     {
         // Implement delete functionality (e.g., confirm and delete the flight)
-        Console.WriteLine($"Deleting flight: {flight.FlightNo}");
+        Log.Debug($"Deleting flight: {flight.FlightNo}");
     }
 
     // Load all flights when the component is initialized
@@ -124,13 +124,13 @@
     private void AddNewFlight()
     {
         // Navigate to a page or open a form to add a new flight
-        NavigationManager.NavigateTo("/add-flight"); // Replace with your own route
+        NavigationManager.NavigateTo("/AddFlight"); // Replace with your own route
     }
 
     // Method to handle Return button click
     private void ReturnToPreviousPage()
     {
-        NavigationManager.NavigateTo("/"); // Navigate to the previous page (or home)
+        NavigationManager.NavigateTo("/AdminHomePage"); // Navigate to the previous page (or home)
     }
 }
 

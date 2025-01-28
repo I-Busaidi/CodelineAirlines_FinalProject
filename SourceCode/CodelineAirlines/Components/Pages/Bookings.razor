@@ -87,11 +87,11 @@
         {
             // Call the service to delete the booking
             BookingService.CancelBooking(bookingId);
-
+            
             // Optionally refresh the bookings list
             foreach (var passenger in passengers)
             {
-                bookings.AddRange(BookingService.GetBookingsForPassenger(passenger.Passport));
+                bookings = BookingService.GetBookingsForPassenger(passenger.Passport).ToList();
             }
         }
         catch (Exception ex)
