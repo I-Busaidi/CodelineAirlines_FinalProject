@@ -1,14 +1,19 @@
 ﻿@page "/AddAirplanes"
 @inject IAirportService airportService
-@inject IAirplaneService airplaneService
+@inject IAirplaneSpecService airplaneSpecService
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
 <MudContainer Class="form-container">
     <MudGrid>
-        <!-- Airplane Model -->
+        <!-- Select Airplane Model -->
         <MudItem xs="12">
-            <MudTextField @bind-Value="model" Label="Model" Variant="Variant.Outlined" Required="true" />
+            <MudSelect T="string" Label="Select Airplane Model" FullWidth="true" @bind-Value="selectedModel" Required="true">
+                @foreach (var model in airplaneModels)
+                {
+                    <MudSelectItem Value="@model.Model">@model.Model</MudSelectItem>
+                }
+            </MudSelect>
         </MudItem>
 
         <!-- Select Airport -->
@@ -21,29 +26,29 @@
             </MudSelect>
         </MudItem>
 
-        <!-- Seat Template Placeholder -->
+        <!-- Manufacture Date -->
         <MudItem xs="12">
-            <MudText Typo="Typo.subtitle1">Seat Template Configuration:</MudText>
-            <MudText Typo="Typo.body2">Seat template details will go here (to be implemented).</MudText>
+            <MudDatePicker Label="Manufacture Date" @bind-Date="manufactureDate" Variant="Variant.Outlined" Required="true" />
         </MudItem>
     </MudGrid>
 
-    <!-- Action Buttons -->
-    <MudGrid Class="mt-4" Style="justify-content: space-between;">
-        <MudItem xs="4">
-            <MudButton OnClick="NavigateToPreviousPage" Color="Color.Secondary" FullWidth="true">Return</MudButton>
-        </MudItem>
-        <MudItem xs="4">
-            <MudButton  Color="Color.Primary" FullWidth="true">Submit</MudButton>
+    <!-- Add Airplane Buttons -->
+    <MudGrid Class="mt-4">
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="manageAirplanes" FullWidth="true">
+                Add Airplane
+            </MudButton>
         </MudItem>
     </MudGrid>
 </MudContainer>
 
 @code {
-    private string model;
-    private GenerateSeatTemplateDto seatTemplate = new GenerateSeatTemplateDto();
+    private string selectedModel;
     private int selectedAirportId;
+    private DateTime? manufactureDate = null;
+
     private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
+    private List<AirplaneSpecOutputDTO> airplaneModels = new List<AirplaneSpecOutputDTO>();
 
     protected override void OnInitialized()
     {
@@ -51,18 +56,19 @@
         {
             // Fetch all airports
             airports = airportService.GetAllAirports();
+
+            // Fetch all airplane models
+            airplaneModels = airplaneSpecService.GetModelsSpecs();
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error fetching airports: " + ex.Message);
-           
+            Console.WriteLine("Error initializing data: " + ex.Message);
         }
     }
-
-  
-    private void NavigateToPreviousPage()
+    // Return to the manageAirplanes page
+    private void manageAirplanes()
     {
-        NavigationManager.NavigateTo("/"); // Navigate back to the previous page
+        NavigationManager.NavigateTo("/manageAirplanes");
     }
 }
 
