@@ -2,29 +2,50 @@
 
 @inject IPassengerService PassengerService
 @inject NavigationManager NavManager
-@attribute [Authorize(Roles = "user")]
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IAuthService authService
+@inject IUserService userService
+@inject IPassengerService passengerService
+@* @attribute [Authorize(Roles = "user")] *@
 <div class="page-container">
 
     <!-- Users Table -->
-    <MudDataGrid T="User" Items="@users" ReadOnly="@_readOnly"
-                 EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
-                 Bordered="true" Dense="true"
-                 EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
-        <Columns>
-            <!-- Email Column -->
-            <PropertyColumn Property="x => x.Email" Title="Email" />
+    <MudContainer Class="form-container">
+        <MudCard>
+            <MudCardContent>
+                <MudGrid>
+                    <!-- Email Field -->
+                    <MudItem xs="12" sm="6" Class="field-container">
+                        <MudGrid AlignItems="Center">
+                            <MudItem xs="4" Class="field-label">
+                                <MudText Typo="Typo.subtitle1"><strong>Email:</strong></MudText>
+                            </MudItem>
+                            <MudItem xs="8" Class="field-value">
+                                <MudText Typo="Typo.body1">@user.UserEmail</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
 
-            <!-- Name Column -->
-            <PropertyColumn Property="x => x.Name" Title="Name" />
 
-            <!-- Edit Button Column -->
-            <TemplateColumn CellClass="d-flex justify-end">
-                <CellTemplate>
-                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
-                </CellTemplate>
-            </TemplateColumn>
-        </Columns>
-    </MudDataGrid>
+                    <!-- Name Field -->
+                    <MudItem xs="12" sm="6" Class="field-container">
+                        <MudGrid AlignItems="Center">
+                            <MudItem xs="4" Class="field-label">
+                                <MudText Typo="Typo.subtitle1"><strong>Name:</strong></MudText>
+                            </MudItem>
+                            <MudItem xs="8" Class="field-value">
+                                <MudText Typo="Typo.body1">@user.UserName</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+
+        
+
+                    
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    
 
     <MudText Typo="Typo.h4" Class="mb-4">Passenger List</MudText>
 
@@ -62,18 +83,25 @@
             </MudExpansionPanel>
         }
     </MudExpansionPanels>
+    </MudContainer>
 </div>
 
 
 @code {
+    public int userId { get; set; }
+    private List<PassengerOutputDTO> passengers = new List<PassengerOutputDTO>();
+    private string? Token;
     // Users List
-    private IEnumerable<User> users = new List<User>
-    {
-        new User { Name = "Marcella Wallace", Email = "admin@demo.com" }
-    };
 
-    // Passenger List
-    private List<PassengerOutputDTO> passengers { get; set; } = new();
+    private User user = new User();
+
+    private void EditUser()
+    {
+        // Add logic for editing the user
+        Console.WriteLine("Edit user clicked.");
+    }
+
+    
 
     // Grid Settings
     private bool _readOnly = false;
@@ -88,33 +116,20 @@
 
     private void GetPassengerProfile()
     {
-        // Fetch passenger profile data using the service
-       // passengers = PassengerService.GetPassengerProfile(userId);
+        Token = HttpContextAccessor.HttpContext?.Request.Cookies["authToken"];
+        if (!string.IsNullOrWhiteSpace(Token))
+        {
+            var claims = JwtHelper.GetClaimsFromToken(Token);
+            if (claims != null)
+            {
+                userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+                user = userService.GetUserByIdWithRelatedData(userId);
+                passengers = passengerService.GetPassengerProfile(userId);
+            }
+        }
     }
-
-    // User Model
-    public class User
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-    }
+    
 }
 
 
-<style>
-    .page-container {
-        display: flex;
-        justify-content: center; 
-        align-items: center; 
-        height: 100vh; 
-        flex-direction: column; 
-        text-align: center; 
-        background-color:lightgray; 
-    }
 
-    .MudDataGrid {
-        width: 200; 
-        max-width: 800px; 
-    }
-
-</style>
