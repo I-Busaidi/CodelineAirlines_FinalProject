@@ -4,10 +4,12 @@
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
-
 @attribute [Authorize(Roles = "admin")]
 
-<MudContainer Class="search-container">
+<MudContainer Class="airport-management-container">
+    <!-- Page Title -->
+    <MudText Typo="Typo.h4" Class="page-title mb-6">Airport Management</MudText>
+
     <!-- Search Bar -->
     <MudGrid>
         <MudItem xs="12">
@@ -17,7 +19,7 @@
                               Adornment="Adornment.Start"
                               Icon="@Icons.Material.Filled.Search"
                               FullWidth="true"
-                              Placeholder="Enter airport name or code..."
+                              Placeholder="Enter airport name, code, city, or country..."
                               OnKeyUp="HandleSearchKeyUp" />
                 <MudIconButton Icon="@Icons.Material.Filled.Search"
                                Color="Color.Primary"
@@ -28,36 +30,53 @@
     </MudGrid>
 
     <!-- Airport Expansion Panels (filtered by search query) -->
-    <MudExpansionPanels>
-        @foreach (var airport in filteredAirports)
+    <MudExpansionPanels Class="mt-4">
+        @if (filteredAirports.Any())
         {
-            <MudExpansionPanel Text="@($"{airport.AirportName} ({airport.AirportId}) - Location: {airport.City}")">
-                <MudCard Class="airport-card">
-                    <MudCardContent>
-                        <MudText Typo="Typo.h6"><strong>Airport Name:</strong> @airport.AirportName</MudText>
-                        <MudText><strong>Code:</strong> @airport.AirportId</MudText>
-                        <MudText><strong>Location:</strong> @airport.City</MudText>
-                        <MudText><strong>Country:</strong> @airport.Country</MudText>
-                    </MudCardContent>
-                    <MudCardActions>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteAirport(airport))">
-                            Delete
-                        </MudButton>
-                    </MudCardActions>
-                </MudCard>
-            </MudExpansionPanel>
+            @foreach (var airport in filteredAirports)
+            {
+                <MudExpansionPanel Text="@($"{airport.AirportName} ({airport.AirportId})")" Icon="@Icons.Material.Filled.AirplanemodeActive" Class="mb-4">
+                    <MudCard Class="airport-card">
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.body1"><strong>Airport Name:</strong> @airport.AirportName</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.body1"><strong>Code:</strong> @airport.AirportId</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.body1"><strong>Location:</strong> @airport.City</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.body1"><strong>Country:</strong> @airport.Country</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteAirport(airport))" StartIcon="@Icons.Material.Filled.Delete">
+                                Delete
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudExpansionPanel>
+            }
+        }
+        else
+        {
+            <MudText Typo="Typo.body2" Class="no-airports-text">No airports found matching your search.</MudText>
         }
     </MudExpansionPanels>
 
     <!-- Action Buttons (Add New Airport and Return) -->
-    <MudGrid Style="justify-content: center;" Class="mt-4">
-        <MudItem xs="4" Class="mr-2">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddNewAirport" FullWidth="true">
+    <MudGrid Class="mt-6" Justify="Justify.Center">
+        <MudItem xs="12" sm="6" md="4" Class="mr-2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddNewAirport" FullWidth="true" StartIcon="@Icons.Material.Filled.Add" Class="action-button">
                 Add New Airport
             </MudButton>
         </MudItem>
-        <MudItem xs="4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+        <MudItem xs="12" sm="6" md="4">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true" StartIcon="@Icons.Material.Filled.ArrowBack" Class="action-button">
                 Return
             </MudButton>
         </MudItem>
@@ -90,9 +109,9 @@
         if (!string.IsNullOrEmpty(searchQuery))
         {
             filteredAirports = airports.Where(a => a.AirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                                    a.AirportId.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)||
-                                                    a.City.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)||
-                                                    a.Country.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+                                                  a.AirportId.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                                  a.City.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                                  a.Country.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
         }
         else
         {
@@ -136,23 +155,49 @@
 }
 
 <style>
-    .search-container {
-        padding: 20px;
-        background-color: #f5f5f5;
+    /* Container Styling */
+    .airport-management-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Page Title Styling */
+    .page-title {
+        font-weight: 700;
+        color: #2c3e50;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    /* Search Button Styling */
+    .search-button {
+        font-weight: 600;
+        padding: 12px;
+        font-size: 16px;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
         border-radius: 8px;
     }
 
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Airport Card Styling */
     .airport-card {
-        border: 2px solid #ddd; /* Add a border around the card */
         border-radius: 8px;
-        padding: 15px;
-        background-color: #fff;
+        background-color: #f8f9fa;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s ease-in-out;
     }
 
         .airport-card:hover {
-            transform: scale(1.05); /* Slight zoom effect on hover */
+            transform: scale(1.02);
         }
 
         .airport-card .mud-card-actions {
@@ -160,17 +205,37 @@
             justify-content: flex-end;
         }
 
-    .mt-2 {
-        margin-top: 20px;
+    /* No Airports Text Styling */
+    .no-airports-text {
+        color: #7f8c8d;
+        font-style: italic;
+    }
+
+    /* Action Buttons Styling */
+    .action-button {
+        font-weight: 600;
+        padding: 12px;
+        font-size: 16px;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
+        border-radius: 8px;
+    }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Spacing Utilities */
+    .mb-6 {
+        margin-bottom: 3rem !important;
     }
 
     .mt-4 {
-        margin-top: 20px;
+        margin-top: 1.5rem !important;
     }
 
-    /* Panel header customization */
-    .mud-expansion-panel-header {
-        background-color: #f5f5f5;
-        font-weight: bold;
+    .mt-6 {
+        margin-top: 3rem !important;
     }
 </style>

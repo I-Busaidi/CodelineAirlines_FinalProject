@@ -1,4 +1,4 @@
-﻿@page "/signup"
+﻿@page "/signupAdmin"
 @inject NavigationManager NavManager
 @inject IUserService UserService
 @inject IEmailService emailService
@@ -75,7 +75,7 @@
                 return;
             }
 
-            signUpModel.UserRole = "user";
+            signUpModel.UserRole = "admin";
             signUpModel.UserPhoneNumber = "+968" + phoneNumber;
             var result = UserService.Register(signUpModel);
 

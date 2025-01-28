@@ -3,18 +3,20 @@
 @inject NavigationManager NavigationManager
 @* @attribute [Authorize(Roles = "admin")] *@
 
-
-
 <MudContainer Class="admin-dashboard-container">
-    <MudText Typo="Typo.h3" Align="Align.Center" Class="title mt-4">Admin Dashboard</MudText>
+    <!-- Header Section -->
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="title mt-4 mb-6">Admin Dashboard</MudText>
 
-    <MudGrid Class="mt-4">
+    <!-- Dashboard Cards Grid -->
+    <MudGrid Class="mt-4" Spacing="5" Justify="Justify.Center">
         <!-- Manage Airports Card -->
-        <MudItem xs="12" sm="4">
-            <MudCard Class="dashboard-card">
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="dashboard-card" Elevation="8" Hover="true">
                 <MudCardContent>
-                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Airports</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageAirports" FullWidth="true" Class="card-button">
+                    <MudIcon Icon="@Icons.Material.Filled.AirplanemodeActive" Size="Size.Large" Class="card-icon" />
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title mt-3">Airports</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="card-subtitle mb-4">Manage airport details and configurations</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NavigateToManageAirports" FullWidth="true" Class="card-button">
                         Manage Airports
                     </MudButton>
                 </MudCardContent>
@@ -22,11 +24,13 @@
         </MudItem>
 
         <!-- Manage Airplanes Card -->
-        <MudItem xs="12" sm="4">
-            <MudCard Class="dashboard-card">
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="dashboard-card" Elevation="8" Hover="true">
                 <MudCardContent>
-                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Airplanes</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageAirplanes" FullWidth="true" Class="card-button">
+                    <MudIcon Icon="@Icons.Material.Filled.AirplaneTicket" Size="Size.Large" Class="card-icon" />
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title mt-3">Airplanes</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="card-subtitle mb-4">Manage airplane fleet and details</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NavigateToManageAirplanes" FullWidth="true" Class="card-button">
                         Manage Airplanes
                     </MudButton>
                 </MudCardContent>
@@ -34,11 +38,13 @@
         </MudItem>
 
         <!-- Manage Flights Card -->
-        <MudItem xs="12" sm="4">
-            <MudCard Class="dashboard-card">
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="dashboard-card" Elevation="8" Hover="true">
                 <MudCardContent>
-                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Flights</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageFlights" FullWidth="true" Class="card-button">
+                    <MudIcon Icon="@Icons.Material.Filled.Flight" Size="Size.Large" Class="card-icon" />
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title mt-3">Flights</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="card-subtitle mb-4">Manage flight schedules and details</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NavigateToManageFlights" FullWidth="true" Class="card-button">
                         Manage Flights
                     </MudButton>
                 </MudCardContent>
@@ -50,53 +56,74 @@
 @code {
     private void NavigateToManageAirports()
     {
-        NavigationManager.NavigateTo("/AirportManagement"); // Replace with your actual route for managing airports
+        NavigationManager.NavigateTo("/AirportManagement");
     }
 
     private void NavigateToManageAirplanes()
     {
-        NavigationManager.NavigateTo("/manageAirplanes"); // Replace with your actual route for managing airplanes
+        NavigationManager.NavigateTo("/manageAirplanes");
     }
 
     private void NavigateToManageFlights()
     {
-        NavigationManager.NavigateTo("/ViewFlightToAdmin"); // Replace with your actual route for managing flights
+        NavigationManager.NavigateTo("/ViewFlightToAdmin");
     }
 }
 
 <style>
+    /* Container Styling */
     .admin-dashboard-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 40px 20px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
+    /* Title Styling */
     .title {
-        font-weight: bold;
-        color: #343a40;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
     }
 
+    /* Card Styling */
     .dashboard-card {
-        border-radius: 15px; /* Rounded corners for cards */
+        border-radius: 15px;
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-        overflow: hidden; /* Ensure content inside the card stays inside */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
     }
 
         .dashboard-card:hover {
-            transform: translateY(-10px); /* Slight lift effect */
-            box-shadow: 0 16px 24px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+            transform: translateY(-10px);
+            box-shadow: 0 16px 24px rgba(0, 0, 0, 0.2);
         }
 
-    .card-title {
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 15px;
+    /* Card Icon Styling */
+    .card-icon {
+        color: #3498db;
+        margin-bottom: 10px;
     }
 
+    /* Card Title Styling */
+    .card-title {
+        font-weight: 700;
+        color: #34495e;
+        margin-bottom: 10px;
+    }
+
+    /* Card Subtitle Styling */
+    .card-subtitle {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    /* Button Styling */
     .card-button {
         font-weight: 600;
         padding: 12px;
@@ -104,32 +131,28 @@
         text-transform: uppercase;
         transition: background-color 0.3s ease;
         border-radius: 50px;
+        background-color: #3498db;
+        color: white;
     }
 
         .card-button:hover {
-            background-color: #0056b3; /* Darker shade of blue on hover */
+            background-color: #2980b9;
         }
 
-    .return-button {
-        font-weight: bold;
-        margin-top: 20px;
-        border-radius: 50px;
-        padding: 12px;
-        font-size: 16px;
-        text-transform: uppercase;
+    /* Spacing Utilities */
+    .mt-3 {
+        margin-top: 1rem !important;
     }
 
-        .return-button:hover {
-            background-color: #6c757d;
-            color: white;
-        }
-
-    /* Card layout spacing */
     .mt-4 {
-        margin-top: 30px !important;
+        margin-top: 1.5rem !important;
     }
 
-    .mr-2 {
-        margin-right: 10px;
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    .mb-6 {
+        margin-bottom: 3rem !important;
     }
 </style>
