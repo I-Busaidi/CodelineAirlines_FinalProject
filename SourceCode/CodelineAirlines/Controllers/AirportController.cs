@@ -19,24 +19,24 @@ namespace CodelineAirlines.Controllers
             _compoundService = compoundService;
         }
 
-        [Authorize(Roles = "admin")]
-        [HttpPost("AddAirport")]
-        public IActionResult AddAirport([FromBody] AirportControllerInputDTO airportInputDTO)
-        {
-            try
-            {
-                var airport = _compoundService.AddAirport(airportInputDTO);
-                return Created(string.Empty, $"{airport.airportName} has been added. City: {airport.city}, Country: {airport.country}");
-            }
-            catch (ArgumentException ex)
-            {
-                return UnprocessableEntity(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //[Authorize(Roles = "admin")]
+        //[HttpPost("AddAirport")]
+        //public IActionResult AddAirport([FromBody] AirportControllerInputDTO airportInputDTO)
+        //{
+        //    try
+        //    {
+        //        var airport = _compoundService.AddAirport(airportInputDTO);
+        //        return Created(string.Empty, $"{airport.airportName} has been added. City: {airport.city}, Country: {airport.country}");
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        return UnprocessableEntity(ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
 
         [HttpGet("GetAirports")]
         public IActionResult GetAirports(

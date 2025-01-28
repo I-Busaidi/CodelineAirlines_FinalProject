@@ -1,6 +1,6 @@
 ﻿@page "/AddAirport"
 @layout Layout.AdminLayout
-@inject IAirportService airportService
+@inject ICompoundService compoundService
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
@@ -62,17 +62,18 @@
 
         try
         {
-            var newAirport = new AirportInputDTO
+            AirportControllerInputDTO newAirport = new AirportControllerInputDTO
                 {
                     AirportName = airportName,
                     City = city
                 };
 
-            airportService.AddAirport(newAirport); // Call service to add airport
+            var response = compoundService.AddAirport(newAirport); // Call service to add airport
             NavigationManager.NavigateTo("/AirportManagement"); // Redirect to management page
         }
         catch (Exception ex)
         {
+            Log.Error(ex.Message);
             errorMessage = $"Error adding airport: {ex.Message}";
         }
     }

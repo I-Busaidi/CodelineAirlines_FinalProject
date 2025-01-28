@@ -87,7 +87,19 @@ namespace CodelineAirlines.Services
             decimal baseCost = flight.Cost; // Use the flight's base cost
 
             // Calculate the class cost based on the selected class
-            decimal classCost = baseCost;
+            decimal classCost = 0;
+            if(bookingDto.Class == "First Class")
+            {
+                classCost = baseCost * FirstClassPercentage;
+            }
+            else if(bookingDto.Class == "Business")
+            {
+                classCost = baseCost * BusinessClassPercentage;
+            }
+            else
+            {
+                classCost = 0;
+            }
             
 
             // Calculate the total cost
@@ -448,6 +460,7 @@ namespace CodelineAirlines.Services
             List<SeatsOutputDTO> availableSeatsList = _mapper.Map<List<SeatsOutputDTO>>(availableSeats);
             return availableSeatsList;
         }
+
         private string NormalizeString(string input)
         {
             return string.Concat(input.Where(c => !char.IsWhiteSpace(c))).ToLower();

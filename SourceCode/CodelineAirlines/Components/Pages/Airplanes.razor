@@ -5,7 +5,7 @@
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
-@attribute [Authorize(Roles = "admin")]
+@* @attribute [Authorize(Roles = "admin")] *@
 
 <MudContainer Class="airplanes-container">
     <!-- Dropdown to Select an Airport -->
@@ -26,7 +26,8 @@
         {
             @foreach (var airplane in selectedAirportAirplanes)
             {
-                <MudExpansionPanel Text="@airplane.AirplaneModel">
+                string header = $"ID: {airplane.AirplaneId} | {airplane.AirplaneModel}";
+                <MudExpansionPanel Text="@header">
                     <MudCard>
                         <MudCardContent>
                             <MudText Typo="Typo.body1">

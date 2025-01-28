@@ -90,12 +90,12 @@
 
     private void GetFilteredFlights()
     {
-        flights = flightService.GetAllFlights().Where(f => f.SourceAirportName == Origin && f.DestinationAirportName == Dest && f.ScheduledDepartureDate >= startDate && f.ScheduledDepartureDate <= endDate ).ToList();
+        flights = flightService.GetAllFlights().Where(f => (f.SourceAirportName == Origin && f.DestinationAirportName == Dest && f.ScheduledDepartureDate >= startDate && f.ScheduledDepartureDate <= endDate) && (f.Status == "Scheduled" || f.Status == "ReScheduled") ).ToList();
     }
 
     private void GetFlights()
     {
-        flights = flightService.GetAllFlights();
+        flights = flightService.GetAllFlights().Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList();
     }
 
     private void NavigateToBooking(string flightNo)

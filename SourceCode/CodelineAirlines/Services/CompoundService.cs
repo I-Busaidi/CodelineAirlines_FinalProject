@@ -57,9 +57,9 @@ namespace CodelineAirlines.Services
             _airplaneSpecService = airplaneSpecService;
         }
 
-        public (string airportName, string country, string city) AddAirport(AirportControllerInputDTO airportInput)
+        public async Task<(string airportName, string country, string city)> AddAirport(AirportControllerInputDTO airportInput)
         {
-            var cityDetails = _weatherService.GetWeatherAsync(airportInput.City);
+            var cityDetails = await _weatherService.GetWeatherAsync(airportInput.City);
             if (cityDetails == null)
             {
                 throw new InvalidOperationException("City name is invalid");
@@ -71,7 +71,7 @@ namespace CodelineAirlines.Services
                     var airport = _airportService.AddAirport(new AirportInputDTO
                     {
                         AirportName = airportInput.AirportName,
-                        Country = cityDetails.Result.sys.country,
+                        Country = cityDetails.sys.country,
                         City = airportInput.City
                     });
 
@@ -79,8 +79,8 @@ namespace CodelineAirlines.Services
                     {
                         Airport = airport,
                         AirportId = airport.AirportId,
-                        AirportLatitude = cityDetails.Result.coord.lat,
-                        AirportLongitude = cityDetails.Result.coord.lon
+                        AirportLatitude = cityDetails.coord.lat,
+                        AirportLongitude = cityDetails.coord.lon
                     });
 
                     _context.SaveChanges();
