@@ -1,10 +1,11 @@
 ﻿@page "/EditFlight/{FlightNo}"
 @layout Layout.AdminLayout
 @inject IFlightService flightService
+@inject IAirplaneService airplaneService
 @inject ICompoundService compoundService
 @inject NavigationManager NavigationManager
 @using MudBlazor
-@attribute [Authorize(Roles = "admin")]
+@* @attribute [Authorize(Roles = "admin")] *@
 <MudContainer Class="edit-flight-container">
     <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-4">Edit Flight</MudText>
 
@@ -12,25 +13,39 @@
         <!-- Airplane ID -->
         <MudGrid>
             <MudItem xs="12">
-                <MudTextField Label="Airplane ID"
-                              @bind-Value="flightInput.AirplaneId"
-                              Type="Number"
-                              Required="true"
-                              For="@(() => flightInput.AirplaneId)" />
+                <MudSelect T="AirplaneOutputDto"
+                           Value="selectedAirplane"
+                           Variant="Variant.Filled"
+                           Label="Airplane"
+                           Margin="Margin.None"
+                           Dense="false"
+                           ReadOnly="false"
+                           Required="true"
+                           Placeholder="@("Select Airplane")"
+                           ValueChanged="OnAirplaneSelected">
+                    @foreach (var airplane in airplanes)
+                    {
+                        string choiceItem = $"ID: {airplane.AirplaneId}| Model: {airplane.AirplaneModel}| Manufactured on: {airplane.ManufactureDate}";
+                        <MudSelectItem Value="airplane">@choiceItem</MudSelectItem>
+                    }
+                </MudSelect>
             </MudItem>
         </MudGrid>
 
         <!-- Scheduled Departure Date -->
         <MudGrid>
             <MudItem xs="12">
-                <MudDatePicker Label="Scheduled Departure Date" @bind-Date="date" Required="true" Class="mb-3" />
+                <MudDatePicker Label="Scheduled Departure Date" @bind-Date="dateInput" Required="true" Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTimePicker Label="Scheduled Departure Time" @bind-Time="timeInput" Required="true" Class="mb-3" />
             </MudItem>
         </MudGrid>
 
         <!-- Submit Button -->
         <MudGrid>
             <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Type="Submit" FullWidth="true">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleValidSubmit" FullWidth="true">
                     Save Changes
                 </MudButton>
             </MudItem>
@@ -50,7 +65,10 @@
 
 @code {
     [Parameter] public string FlightNo { get; set; }
-    private DateTime? date = null;
+    private List<AirplaneOutputDto> airplanes = new List<AirplaneOutputDto>();
+    private AirplaneOutputDto selectedAirplane;
+    private DateTime? dateInput = null;
+    private TimeSpan? timeInput = null;
     private FlightInputDTO flightInput = new FlightInputDTO();
     private MudForm flightForm;
     private Models.Flight flight = new Models.Flight();
@@ -58,8 +76,12 @@
     protected override void OnInitialized()
     {
         flight = flightService.GetFlightByIdWithRelatedData(int.Parse(FlightNo));
+        airplanes = airplaneService.GetAll().Where(a => a.CurrentAirportId == flight.SourceAirportId).ToList();
     }
-
+    private void OnAirplaneSelected(AirplaneOutputDto airplane)
+    {
+        selectedAirplane = airplane;
+    }
     // Handle form submission to update flight details
     private void HandleValidSubmit()
     {
@@ -68,8 +90,8 @@
             if (flight != null)
             {
                 // Populate the form with existing flight details
-                flightInput.AirplaneId = flight.AirplaneId;
-                flightInput.ScheduledDepartureDate = (DateTime)date;
+                flightInput.AirplaneId = selectedAirplane.AirplaneId;
+                flightInput.ScheduledDepartureDate = dateInput.Value.Add(timeInput.Value);
             }
             // Call the service to update the flight details (only AirplaneId and ScheduledDepartureDate)
             compoundService.RescheduleFlight(int.Parse(FlightNo), flightInput.ScheduledDepartureDate, flightInput.AirplaneId);

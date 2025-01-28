@@ -1,0 +1,38 @@
+﻿
+
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            Delete flight?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Value="@flight.FlightNo" Label="Flight No" ReadOnly="true" />
+        <MudTextField Value="@flight.SourceAirportName" Label="Origin" ReadOnly="true" />
+        <MudTextField Value="@flight.DestinationAirportName" Label="Destination" ReadOnly="true" />
+        <MudTextField Value="@flight.ScheduledDepartureDate" Label="Departure Date" ReadOnly="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteServer">Cancel Flight</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public FlightOutputDTO flight { get; set; } = new FlightOutputDTO();
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void DeleteServer()
+    {
+        //In a real world scenario this bool would probably be a service to delete the item from api/database
+        Snackbar.Add("Flight Canceled", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(flight.FlightNo));
+    }
+}

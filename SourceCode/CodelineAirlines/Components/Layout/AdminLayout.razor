@@ -47,6 +47,11 @@
             var claims = JwtHelper.GetClaimsFromToken(Token);
             if (claims != null)
             {
+                string userRole = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                if (userRole == "user")
+                {
+                    NavManager.NavigateTo("/");
+                }
                 int userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
                 if (userId > 0)
                 {

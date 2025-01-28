@@ -11,20 +11,19 @@
     <!-- Search Bar -->
     <MudGrid>
         <MudItem xs="12">
-            <MudTextField Label="Search Airports"
-                          @bind-Value="searchQuery"
-                          Adornment="Adornment.Start"
-                          Icon="@Icons.Material.Filled.Search"
-                          FullWidth="true"
-                          Placeholder="Enter airport name or code..."
-                          OnKeyUp="HandleSearchKeyUp" />
-        </MudItem>
-    </MudGrid>
-
-    <!-- Search Button -->
-    <MudGrid Style="justify-content: center;" Class="mt-2">
-        <MudItem xs="4">
-            <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Large" OnClick="OnSearchClicked" />
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <MudTextField Label="Search Airports"
+                              @bind-Value="searchQuery"
+                              Adornment="Adornment.Start"
+                              Icon="@Icons.Material.Filled.Search"
+                              FullWidth="true"
+                              Placeholder="Enter airport name or code..."
+                              OnKeyUp="HandleSearchKeyUp" />
+                <MudIconButton Icon="@Icons.Material.Filled.Search"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               OnClick="OnSearchClicked" />
+            </div>
         </MudItem>
     </MudGrid>
 

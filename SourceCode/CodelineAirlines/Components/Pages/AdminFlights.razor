@@ -2,29 +2,27 @@
 @layout Layout.AdminLayout
 @inject IFlightService flightService
 @inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject ICompoundService compoundService
 @using MudBlazor
-
-@attribute [Authorize(Roles = "admin")]
-
+@* @attribute [Authorize(Roles = "admin")] *@
 <MudContainer Class="search-container">
     <!-- Search Bar -->
     <MudGrid>
         <MudItem xs="12">
-            <MudTextField Label="Search Flights"
-                          @bind-Value="searchQuery"
-                          Adornment="Adornment.Start"
-                          Icon="@Icons.Material.Filled.Search"
-                          FullWidth="true"
-                          Placeholder="Enter flight number or name..."
-                          OnKeyUp="HandleSearchKeyUp" />
-        </MudItem>
-    </MudGrid>
-
-    <!-- Search Button centered -->
-    <MudGrid Style="justify-content: center;" Class="mt-2">
-        <MudItem xs="4">
-            <!-- Using MudIconButton for search -->
-            <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Large" OnClick="OnSearchClicked" />
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <MudTextField Label="Search Flights"
+                              @bind-Value="searchQuery"
+                              Adornment="Adornment.Start"
+                              Icon="@Icons.Material.Filled.Search"
+                              FullWidth="true"
+                              Placeholder="Enter flight number or name..."
+                              OnKeyUp="HandleSearchKeyUp" />
+                <MudIconButton Icon="@Icons.Material.Filled.Search"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               OnClick="OnSearchClicked" />
+            </div>
         </MudItem>
     </MudGrid>
 
@@ -51,6 +49,7 @@
             </MudExpansionPanel>
         }
     </MudExpansionPanels>
+    
     <!-- Action Buttons (Add New Flight and Return) -->
     <MudGrid Style="justify-content: center;" Class="mt-4">
         <MudItem xs="4" Class="mr-2">
@@ -90,9 +89,10 @@
     {
         if (!string.IsNullOrEmpty(searchQuery))
         {
-            filteredFlights = flights.Where(f => f.FlightNo.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            filteredFlights = flights.Where(f => (f.FlightNo.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
                                                   f.SourceAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                                  f.DestinationAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+                                                  f.DestinationAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                                                    ) && (f.Status == "Scheduled" || f.Status == "ReScheduled")).ToList();
         }
         else
         {
@@ -104,20 +104,51 @@
     private void EditFlight(FlightOutputDTO flight)
     {
         // Implement editing functionality (e.g., open a form to edit the flight)
-        Log.Debug($"Editing flight: {flight.FlightNo}");
+        Log.Information($"Editing flight: {flight.FlightNo}");
+        NavigationManager.NavigateTo($"/EditFlight/{flight.FlightNo}");
     }
 
-    private void DeleteFlight(FlightOutputDTO flight)
+    private async Task DeleteFlight(FlightOutputDTO flight)
     {
-        // Implement delete functionality (e.g., confirm and delete the flight)
-        Log.Debug($"Deleting flight: {flight.FlightNo}");
+        try
+        {
+            Log.Information($"Deleting flight: {flight.FlightNo}");
+            var parameters = new DialogParameters<Dialog>
+            {
+                {
+                    x=>x.flight, flight
+                }
+            };
+
+            var dialog = await DialogService.ShowAsync<Dialog>("Cancel flight", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                Guid.TryParse(result.Data.ToString(), out Guid deletedServer);
+                compoundService.CancelFlight(flight.FlightNo, "Weather Conditions");
+                // Perform delete action
+                Log.Information("Delete confirmed!");
+                flights = flightService.GetAllFlights(); // Get all flights from the service
+                filteredFlights = flights.Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList(); // Show all flights initially
+            }
+            else
+            {
+                Log.Information("Delete canceled.");
+            }
+        }
+        catch(Exception ex)
+        {
+            Log.Error(ex.Message);
+        }
+
     }
 
     // Load all flights when the component is initialized
     protected override void OnInitialized()
     {
         flights = flightService.GetAllFlights(); // Get all flights from the service
-        filteredFlights = flights; // Show all flights initially
+        filteredFlights = flights.Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList(); // Show all flights initially
     }
 
     // Method to handle Add New Flight button click
