@@ -49,11 +49,17 @@
             var claims = JwtHelper.GetClaimsFromToken(Token);
             if (claims != null)
             {
+                string userRole = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                if (userRole == "admin")
+                {
+                    NavManager.NavigateTo("/AdminHomePage");
+                }
                 int userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
                 if (userId > 0)
                 {
                     user = userService.GetUserByID(userId);
                 }
+
             }
         }
     }
