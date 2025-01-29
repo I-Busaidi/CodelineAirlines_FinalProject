@@ -3,65 +3,94 @@
 @inject IFlightService flightService
 @inject IAirportService airportService
 @inject NavigationManager navManager
+
 @attribute [AllowAnonymous]
+
 <PageTitle>Home</PageTitle>
-<!-- Carousel Section -->
-<MudContainer Class="carousel-container">
-    <MudCarousel Class="mud-carousel" AutoCycle="true" AutoCycleTime="TimeSpan.FromMilliseconds(2000)" Style="height:500px; width: 100vw; " TData="object">
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic1.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>The sky is not the limit, it’s just the beginning.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic2.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>Legends On Board.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic3.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>See the World Differently.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic5.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>The better way to fly.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic6.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>The world's favourite airline.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic7.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>Making it easier to get there.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic8.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>Great people. Great seats. Great service.</h2>
-            </div>
-        </MudCarouselItem>
-        <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
-            <MudImage Src="/Images/LandscapePic9.jpg" Class="carousel-image" />
-            <div class="text-overlay">
-                <h2>On Time, Every Time.</h2>
-            </div>
-        </MudCarouselItem>
-    </MudCarousel>
-</MudContainer>
-<MudContainer Class="search-wrapper">
-    <MudContainer Class="search-section">
+
+<!-- 1) CAROUSEL SECTION (Hero) -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <!-- We wrap MudCarouselItem(s) with a div that can have a pseudo-element for fade-out -->
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="true"
+                     AutoCycleTime="TimeSpan.FromMilliseconds(3000)"
+                     Style="height:500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic1.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>The sky is not the limit, it’s just the beginning.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic2.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>Legends On Board.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic3.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>See the World Differently.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic5.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>The better way to fly.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic6.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>The world's favourite airline.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic7.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>Making it easier to get there.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic8.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>Great people. Great seats. Great service.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/LandscapePic9.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>On Time, Every Time.</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+        </MudCarousel>
+    </div>
+</div>
+
+
+<MudContainer Class="search-wrapper fade-in-panel">
+    <MudContainer Class="search-section glass-panel">
         <MudGrid Gutter="2" AlignItems="Center" JustifyContent="SpaceBetween">
-            <!-- From Section -->
+            <!-- Origin -->
             <MudItem xs="12" sm="6" md="3">
                 <MudSelect T="AirportOutputDTO"
                            Value="FromLocation"
@@ -73,7 +102,6 @@
                            ReadOnly="false"
                            Placeholder="Select origin"
                            ValueChanged="OnOriginSelected">
-                           
                     @foreach (var airport in airportsOrigin)
                     {
                         string choiceItem = $"{airport.City}, {airport.Country}, {airport.AirportName}";
@@ -82,7 +110,7 @@
                 </MudSelect>
             </MudItem>
 
-            <!-- Where To Section -->
+            <!-- Destination -->
             <MudItem xs="12" sm="6" md="3">
                 <MudSelect T="AirportOutputDTO"
                            Value="ToLocation"
@@ -92,7 +120,7 @@
                            Dense="false"
                            ReadOnly="false"
                            Disabled="@originEmpty"
-                           Placeholder="@("Select Destination")"
+                           Placeholder="Select Destination"
                            ValueChanged="OnDestSelected">
                     @foreach (var airport in airportsDest)
                     {
@@ -102,21 +130,29 @@
                 </MudSelect>
             </MudItem>
 
-            <!-- Travel Dates Section -->
+            <!-- Travel Dates -->
             <MudItem xs="12" sm="6" md="3">
                 <MudStack>
-                    <MudDateRangePicker @ref="_picker" Label="Travel Dates" @bind-DateRange="_dateRange"
-                                        AutoClose="true" PickerVariant="PickerVariant.Dialog" Color="Color.Warning">
+                    <MudDateRangePicker @ref="_picker"
+                                        Label="Travel Dates"
+                                        @bind-DateRange="_dateRange"
+                                        AutoClose="true"
+                                        PickerVariant="PickerVariant.Dialog"
+                                        Color="Color.Warning">
                         <PickerActions>
-                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
+                            <MudButton Class="mr-auto align-self-start"
+                                       OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
                             <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton>
-                            <MudButton Color="Color.Primary" OnClick="@(() => _picker.CloseAsync())">Ok</MudButton>
+                            <MudButton Color="Color.Primary"
+                                       OnClick="@(() => _picker.CloseAsync())">Ok</MudButton>
                         </PickerActions>
                     </MudDateRangePicker>
                 </MudStack>
             </MudItem>
+
             <MudSpacer />
-            <!-- Find Flights Button -->
+
+            <!-- Search Flights Button -->
             <MudItem xs="12" sm="12" md="1" Align="Align.Center">
                 <MudButton Variant="Variant.Filled" Color="Color.Warning"
                            OnClick="FindFlights"
@@ -124,9 +160,10 @@
                     Search Flights
                 </MudButton>
             </MudItem>
+            <!-- View All Flights Button -->
             <MudItem xs="12" sm="12" md="1" Align="Align.Center">
                 <MudButton Variant="Variant.Filled" Color="Color.Tertiary"
-                            OnClick="ViewAllFlights">
+                           OnClick="ViewAllFlights">
                     All Flights
                 </MudButton>
             </MudItem>
@@ -134,31 +171,23 @@
     </MudContainer>
 </MudContainer>
 
-
-
-<br />
-<!-- Trending Destinations Section -->
+<!-- 3) TRENDING DESTINATIONS -->
 <MudContainer Class="trending-section">
     <MudStack Direction="Row" JustifyContent="SpaceBetween">
-        <!-- Title -->
         <MudText Typo="Typo.h5" Class="trending-title">
             Trending destinations
         </MudText>
-        <!-- Divider -->
         <MudDivider Class="blue-line" />
     </MudStack>
 </MudContainer>
 
-
-<!-- Flights Section -->
-<!-- Flights Section -->
+<!-- 4) FLIGHTS SECTION -->
 <MudContainer>
     <div class="card-container">
-        
         @foreach (var flight in flights)
         {
             count++;
-            string imgSrc = $"IMG{count}.jpg";
+            string imgSrc = $"IMG{count}.jpg";   // Example image name
             string route = $"{flight.SourceAirportName} to {flight.DestinationAirportName}";
             <MudCard Class="card-item">
                 <MudCardMedia Image="@imgSrc" Title="@flight.SourceAirportName" Class="card-image" />
@@ -166,9 +195,14 @@
                     <MudText Typo="Typo.h6">@route</MudText>
                     <MudText Typo="Typo.body2">@flight.ScheduledDepartureDate.ToString("dd / MM / yyyy")</MudText>
                     <MudText Typo="Typo.h6">From OMR @flight.Cost</MudText>
-                    <MudButton Color="Color.Info" OnClick="@(() => OnBookButtonClick(flight.FlightNo))">Book now</MudButton>
+                    <MudButton Color="Color.Info"
+                               OnClick="@(() => OnBookButtonClick(flight.FlightNo))">
+                        Book now
+                    </MudButton>
                 </MudCardContent>
             </MudCard>
+
+            @* Limit to 4 flights in this sample *@
             if (count == 4)
             {
                 count = 0;
@@ -178,7 +212,6 @@
     </div>
 </MudContainer>
 
-
 @code {
     private int count = 0;
     private bool arrows = true;
@@ -187,63 +220,22 @@
     private bool autocycle = true;
 
     private MudDateRangePicker _picker;
-    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(30).Date);
-    private bool _autoClose;
+    private DateRange _dateRange = new(DateTime.Now.Date, DateTime.Now.AddDays(30).Date);
 
-    private bool IsDatePickerOpen = false; 
-    private DateTime? TravelDate = DateTime.Today; 
+    private bool IsDatePickerOpen = false;
+    private DateTime? TravelDate = DateTime.Today;
     private string TravelDateText => TravelDate?.ToShortDateString() ?? "Select your travel date";
-    private void ToggleDatePicker()
-    {
-        IsDatePickerOpen = !IsDatePickerOpen;
-    }
+
     private AirportOutputDTO FromLocation;
     private AirportOutputDTO ToLocation;
 
     bool originEmpty = true;
     bool destEmpty = true;
-    private void OnOriginSelected(AirportOutputDTO airport)
-    {
-        if (airport != null)
-        {
-            FromLocation = airport;
-            // Filter destination airports, excluding the selected origin airport
-            airportsDest = airports.Where(a => a.AirportName != FromLocation.AirportName).ToList();
-            originEmpty = false;
 
-            // Optional: Log or update UI
-            Console.WriteLine($"Origin selected: {FromLocation.City}, {FromLocation.Country}, {FromLocation.AirportName}");
-        }
-        else
-        {
-            originEmpty = true;
-            airportsDest = airports; // Reset to all airports
-        }
-    }
-
-    private void OnDestSelected(AirportOutputDTO airport)
-    {
-        if (airport != null)
-        {
-            ToLocation = airport;
-            // Filter destination airports, excluding the selected origin airport
-            airportsOrigin = airports.Where(a => a.AirportName != ToLocation.AirportName).ToList();
-            destEmpty = false;
-
-            // Optional: Log or update UI
-            Console.WriteLine($"Destination selected: {ToLocation.City}, {ToLocation.Country}, {ToLocation.AirportName}");
-        }
-        else
-        {
-            destEmpty = true;
-            airportsOrigin = airports; // Reset to all airports
-        }
-    }
-
-    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
-    private List<AirportOutputDTO> airportsOrigin = new List<AirportOutputDTO>();
-    private List<AirportOutputDTO> airportsDest = new List<AirportOutputDTO>();
-    private List<FlightOutputDTO> flights = new List<FlightOutputDTO>();
+    private List<AirportOutputDTO> airports = new();
+    private List<AirportOutputDTO> airportsOrigin = new();
+    private List<AirportOutputDTO> airportsDest = new();
+    private List<FlightOutputDTO> flights = new();
 
     protected override void OnInitialized()
     {
@@ -252,14 +244,48 @@
         flights = flightService.GetAllFlights();
     }
 
+    private void OnOriginSelected(AirportOutputDTO airport)
+    {
+        if (airport != null)
+        {
+            FromLocation = airport;
+            airportsDest = airports.Where(a => a.AirportName != FromLocation.AirportName).ToList();
+            originEmpty = false;
+
+            Console.WriteLine($"Origin selected: {FromLocation.City}, {FromLocation.Country}, {FromLocation.AirportName}");
+        }
+        else
+        {
+            originEmpty = true;
+            airportsDest = airports; // reset
+        }
+    }
+
+    private void OnDestSelected(AirportOutputDTO airport)
+    {
+        if (airport != null)
+        {
+            ToLocation = airport;
+            airportsOrigin = airports.Where(a => a.AirportName != ToLocation.AirportName).ToList();
+            destEmpty = false;
+
+            Console.WriteLine($"Destination selected: {ToLocation.City}, {ToLocation.Country}, {ToLocation.AirportName}");
+        }
+        else
+        {
+            destEmpty = true;
+            airportsOrigin = airports; // reset
+        }
+    }
+
     private void OnBookButtonClick(int flightNo)
     {
-        navManager.NavigateTo($"/book-flight/{flightNo.ToString()}");
+        navManager.NavigateTo($"/book-flight/{flightNo}");
     }
 
     private void FindFlights()
     {
-        if (string.IsNullOrWhiteSpace(FromLocation.AirportName) || string.IsNullOrWhiteSpace(ToLocation.AirportName))
+        if (string.IsNullOrWhiteSpace(FromLocation?.AirportName) || string.IsNullOrWhiteSpace(ToLocation?.AirportName))
         {
             Console.WriteLine("Please fill in all fields before searching.");
         }
@@ -276,121 +302,168 @@
         navManager.NavigateTo("/flights");
     }
 }
+
 <style>
-    .carousel-image {
-        background-position: center 30%;
-        background-repeat: no-repeat;
-        background-size: cover;
-        bottom: 0;
 
 
-        position: sticky;
-        top: 0;
+/********************************************************
+ * CAROUSEL CONTAINER + FADING
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    /* If you want a gradient behind the carousel, uncomment:
+    background: linear-gradient(
+        to bottom,
+        rgba(59, 130, 246, 0.7),
+        rgba(255, 165, 0, 0.2)
+    );
+    */
+}
 
-        width: 100%;
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+/* The image inside each carousel item */
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: fill;
+    display: block;
+}
+
+/* Fade out bottom portion of the image */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .text-overlay {
-        position: absolute;
-        top: 50%; /* Center vertically */
-        left: 50%; /* Center horizontally */
-        transform: translate(-50%, -50%); /* Adjust for exact centering */
-        color: white; /* Text color */
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Add shadow to text */
-        padding: 10px 20px; /* Add some padding around the text */
-        border-radius: 10px; /* Optional: Rounded corners */
-        text-align: center;
-        z-index: 2; /* Ensure the text appears above the image */
-        white-space: nowrap; /* Prevent text wrapping */
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
-  
-    .mud-carousel
-    {
-        border-radius: 0 0 20px 20px;
-        height: 500px;
-        margin: 0;
-        padding: 0 20%;
-        overflow: hidden;
-        min-width: 1500px;
-        align-self: center ;
-    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.6s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * SEARCH WRAPPER / GLASS PANEL
+ ********************************************************/
+.search-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: -6%; /* overlap the carousel, adjust as needed */
+    padding: 0;
+    z-index: 4;
+    position: relative;
+}
+
+.search-section {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px;
+    background-color: rgba(244, 244, 244, 0.98);
+    backdrop-filter: blur(5px);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
 
 
-    
-
-    .card-image {
-        height: 150px;
-        object-fit: cover;
-        border-radius: 4px; 
-    } 
+/* .glass-panel {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(5px);
+} */
 
 
+/********************************************************
+ * TRENDING SECTION
+ ********************************************************/
+.trending-section {
+    margin-top: 5%;
+    margin-bottom: 24px;
+}
 
-    .search-section {
-        margin: 16px 0; 
-    }
+/********************************************************
+ * FLIGHTS CARD SECTION
+ ********************************************************/
+.card-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 0;
+}
 
-    .carousel-container {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+.card-item {
+    width: 300px;
+    margin: 0;
+    background-color: rgba(244, 244, 244, 0.98);
+    backdrop-filter: blur(5px);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
 
-   
+.card-image {
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+}
 
-    .trending-section {
-        margin-bottom: 24px; 
-    }
-
-
-    .search-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: -80px;
-        padding: 0;
-    }
-
-    .search-section {
-        width: 100%;
-        padding: 40px; 
-        background-color: rgba(244, 244, 244, 0.98);
-        backdrop-filter: blur(5px);
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
-        border-radius: 10px; 
-        z-index: 4;
-    }
-  
-    .card-container {
-        display: flex;
-        justify-content: space-between; 
-        align-items: center;
-        flex-wrap: nowrap; 
-        gap: 20px; 
-
-        padding: 0;
-    }
-
-    .card-item {
-        width: 300px;
-        margin: 0; 
-        background-color: rgba(244, 244, 244, 0.98);
-        backdrop-filter: blur(5px);
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-    }
-
-    .card-image {
-        height: 150px;
-        object-fit: cover;
-        border-radius: 4px; 
-    }
-
-
-    body {
-        margin-top: -64px;
-        
-        height: 100vh; 
-    }
-
+/********************************************************
+ * BODY OVERRIDE
+ ********************************************************/
+body {
+    margin-top: -64px; /* Adjust if your app bar is pinned at top */
+    height: 100vh;
+}
 </style>
-
-

@@ -4,10 +4,37 @@
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
-
 @attribute [Authorize(Roles = "admin")]
 
-<MudContainer Class="search-container">
+<!-- 1) Fading Hero Carousel at the Top -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="true"
+                     AutoCycleTime="TimeSpan.FromMilliseconds(2000)"
+                     Style="height: 500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarousel Class="mud-carousel"
+                         AutoCycle="false"
+                         Style="height: 500px; width: 100vw;"
+                         TData="object"
+                         Transition="@Transition.Fade">
+                <MudCarouselItem Color="@Color.Primary">
+                    <div class="carousel-item-content">
+                        <MudImage Src="/Images/background5.jpg" Class="carousel-image" />
+                        <div class="text-overlay">
+                            <h2>Airport Management</h2>
+                        </div>
+                    </div>
+                </MudCarouselItem>
+            </MudCarousel>
+        </MudCarousel>
+    </div>
+</div>
+
+<!-- 2) Frosted-Glass Container Overlapping the Carousel -->
+<MudContainer Class="airport-management-container fade-in-panel">
     <!-- Search Bar -->
     <MudGrid>
         <MudItem xs="12">
@@ -52,12 +79,18 @@
     <!-- Action Buttons (Add New Airport and Return) -->
     <MudGrid Style="justify-content: center;" Class="mt-4">
         <MudItem xs="4" Class="mr-2">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddNewAirport" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="AddNewAirport"
+                       FullWidth="true">
                 Add New Airport
             </MudButton>
         </MudItem>
         <MudItem xs="4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       OnClick="ReturnToPreviousPage"
+                       FullWidth="true">
                 Return
             </MudButton>
         </MudItem>
@@ -66,16 +99,21 @@
 
 @code {
     private string searchQuery = string.Empty;
-    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
-    private List<AirportOutputDTO> filteredAirports = new List<AirportOutputDTO>();
+    private List<AirportOutputDTO> airports = new();
+    private List<AirportOutputDTO> filteredAirports = new();
 
-    // Trigger search when search button is clicked
+    protected override void OnInitialized()
+    {
+        // Fetch the list of airports from the service
+        airports = airportService.GetAllAirports();
+        filteredAirports = airports; // Show all airports initially
+    }
+
     private void OnSearchClicked()
     {
         FilterAirports();
     }
 
-    // Handle Enter key press to trigger search
     private void HandleSearchKeyUp(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -84,30 +122,30 @@
         }
     }
 
-    // Filter airports based on the search query
     private void FilterAirports()
     {
         if (!string.IsNullOrEmpty(searchQuery))
         {
-            filteredAirports = airports.Where(a => a.AirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                                    a.AirportId.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)||
-                                                    a.City.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)||
-                                                    a.Country.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            filteredAirports = airports
+                .Where(a => a.AirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                         || a.AirportId.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                         || a.City.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                         || a.Country.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
         else
         {
-            filteredAirports = airports; // Show all airports if search query is empty
+            filteredAirports = airports;
         }
     }
 
-    // Example method to delete an airport
     private void DeleteAirport(AirportOutputDTO airport)
     {
         try
         {
-            airportService.DeleteAirport(airport.AirportId); // Call the service to delete the airport by its code
-            airports.Remove(airport); // Remove the airport from the list
-            FilterAirports(); // Update the filtered list
+            airportService.DeleteAirport(airport.AirportId);
+            airports.Remove(airport);
+            FilterAirports();
         }
         catch (Exception ex)
         {
@@ -115,62 +153,167 @@
         }
     }
 
-    // Navigate to the Add New Airport page
     private void AddNewAirport()
     {
-        NavigationManager.NavigateTo("/AddAirport"); // Replace with the route to your Add Airport page
+        NavigationManager.NavigateTo("/AddAirport");
     }
 
-    // Return to the previous page
     private void ReturnToPreviousPage()
     {
-        NavigationManager.NavigateTo("/AdminHomePage"); // Navigate to the home page or previous page
-    }
-
-    // Load airports when the page is initialized
-    protected override void OnInitialized()
-    {
-        airports = airportService.GetAllAirports(); // Fetch the list of airports from the service
-        filteredAirports = airports; // Show all airports initially
+        NavigationManager.NavigateTo("/AdminHomePage");
     }
 }
 
 <style>
-    .search-container {
-        padding: 20px;
-        background-color: #f5f5f5;
-        border-radius: 8px;
+/* 
+   1) Make sure your chosen font (e.g., Nunito) is imported globally in:
+      _Host.cshtml (Blazor Server) or index.html (Blazor WebAssembly).
+      e.g.:
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet"
+      />
+*/
+
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fade out bottom portion of the image */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FROSTED-GLASS CONTAINER
+ ********************************************************/
+.airport-management-container {
+    margin: -16% auto 50px; /* overlap the carousel */
+    max-width: 1200px;
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .airport-card {
-        border: 2px solid #ddd; /* Add a border around the card */
-        border-radius: 8px;
-        padding: 15px;
-        background-color: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease-in-out;
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
+}
 
-        .airport-card:hover {
-            transform: scale(1.05); /* Slight zoom effect on hover */
-        }
+.fade-in-panel {
+    animation: fadeInUp 0.7s ease-in-out forwards;
+    opacity: 0;
+}
 
-        .airport-card .mud-card-actions {
-            display: flex;
-            justify-content: flex-end;
-        }
+/********************************************************
+ * SEARCH & CARD STYLING
+ ********************************************************/
+.search-container {
+    /* The outer container for searching, 
+       now replaced by .airport-management-container (frosted glass) */
+}
 
-    .mt-2 {
-        margin-top: 20px;
-    }
+.airport-card {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
 
-    .mt-4 {
-        margin-top: 20px;
-    }
+.airport-card:hover {
+    transform: scale(1.05);
+}
 
-    /* Panel header customization */
-    .mud-expansion-panel-header {
-        background-color: #f5f5f5;
-        font-weight: bold;
+.airport-card .mud-card-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Utility classes for spacing */
+.mt-4 {
+    margin-top: 20px !important;
+}
+.mr-2 {
+    margin-right: 10px !important;
+}
+
+/* Panel header customization */
+.mud-expansion-panel-header {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+body {
+        margin-top: -64px; /* Adjust if your app bar is pinned at top */
+        height: 100vh;
     }
 </style>

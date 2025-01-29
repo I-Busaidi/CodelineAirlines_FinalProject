@@ -3,6 +3,7 @@ using CodelineAirlines.DTOs.AirportDTOs;
 using CodelineAirlines.Models;
 using CodelineAirlines.Repositories;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Serilog;
 
 namespace CodelineAirlines.Services
 {
@@ -48,7 +49,7 @@ namespace CodelineAirlines.Services
             var airports = _airportRepository.GetAllAirports().ToList();
             if (airports == null || airports.Count == 0)
             {
-                throw new InvalidOperationException("No airports available");
+               Log.Error("No airports available");
             }
 
             var airportsOutput = _mapper.Map<List<AirportOutputDTO>>(airports);

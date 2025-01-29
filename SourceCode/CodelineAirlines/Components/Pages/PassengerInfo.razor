@@ -8,98 +8,213 @@
 @inject NavigationManager NavManager
 @attribute [Authorize(Roles = "user")]
 @using MudBlazor
-    @using System.ComponentModel.DataAnnotations
+@using System.ComponentModel.DataAnnotations
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="pa-6" Style="min-height: 100vh;">
-    <MudText Typo="Typo.h4" Class="mb-6 text-center">Book Flight @FlightNo</MudText>
+<!-- 
+  CAROUSEL SECTION 
+  This carousel extends to the very top of the page, 
+  allowing your absolute-positioned app bar (from the layout) 
+  to sit on top of it. 
+-->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <div class="custom-carousel-item">
+            <!-- Replace with your image path -->
+            <img src="/Images/backgroundCarousel2.jpg" class="carousel-image" />
+            <div class="text-overlay">
+                <h1 class="text-title">Explore the Skies</h1>
+                <p class="text-subtitle">Seamless Booking for Your Dream Destinations</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Flexbox Layout -->
+<!-- 
+  MAIN BOOKING CONTAINER 
+  Negative top margin -> Overlaps the carousel. 
+-->
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-6 main-container" Style="min-height: 100vh; color:#546E7A">
+    <MudText Typo="Typo.h4" Class="mb-6 text-center">Booking Flight @FlightNo</MudText>
+
+    <!-- FLEX LAYOUT: TABS (LEFT) | PASSENGER LIST (RIGHT) -->
     <div class="d-flex justify-content-between align-items-start" style="min-height: 100vh;">
-        <!-- Left: Passenger Information Form (Smaller Size) -->
-        <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+
+        <!-- LEFT: TABS for New/Existing Passenger -->
+        <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6 fade-in-panel">
             <MudTabPanel Text="New Passenger">
-                <MudPaper Class="pa-4 mb-8 w-40" Elevation="4" Style="height: 100%;">
-                <EditForm Model="@model" OnValidSubmit="AddPassenger">
-                <DataAnnotationsValidator />
-                <MudText Typo="Typo.h5" Class="mb-4">Passenger Information</MudText>
-
-                <!-- Passenger Name -->
-                <MudTextField Label="Passenger Name" @bind-Value="model.PassengerName" Required="true" Class="mb-3" />
-
-                <!-- Passport Number -->
-                <MudTextField Label="Passport Number" @bind-Value="model.Passport" Required="true" Class="mb-3" />
-
-                <!-- Gender -->
-                <MudSelect T="string" Label="Gender" @bind-Value="model.Gender" Required="true" Class="mb-3">
-                    <MudSelectItem Value="@gender[0]">Male</MudSelectItem>
-                    <MudSelectItem Value="@gender[1]">Female</MudSelectItem>
-                </MudSelect>
-
-                <!-- Birth Date -->
-                <MudDatePicker Label="Date of Birth" @bind-Date="pickedDate" Required="true" Class="mb-3" />
-
-                <!-- Nationality -->
-                <MudTextField Label="Nationality" @bind-Value="model.Nationality" Required="true" Class="mb-3" />
-
-                <MudText Typo="Typo.h6" Class="mt-4 mb-4">Selected Flight: @FlightNo</MudText>
-
-                <!-- Buttons -->
-                <MudItem xs="12" Class="d-flex justify-center mt-6">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" ButtonType="ButtonType.Submit" Size="Size.Medium">Add Passenger</MudButton>
-                    <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty" OnClick="NavigateToSeatBooking">CHOOSE YOUR SEAT</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
-                </MudItem>
-                </EditForm>
-                </MudPaper>
-            </MudTabPanel>
-            <MudTabPanel Text="Existing" Disabled="false" >
-                <MudItem xs="12">
-                    <MudSelect T="PassengerOutputDTO" Label="Select Passenger" FullWidth="true"
-                               Value="selectedPassenger" Required="true" ValueChanged="OnPassengerSelected"
-                               SelectedValueFunc="GetPassengerDisplayText" Placeholder="Select Passenger">
-                        @foreach (var passenger in passengers)
-                        {
-                            <MudSelectItem Value="@passenger">Name: @passenger.PassengerName | Passport: @passenger.Passport</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudPaper Class="pa-4 mb-8 w-40" Elevation="4" Style="height: 100%;">
-                    <EditForm Model="@modelOut" OnValidSubmit="AddExistingPassenger">
+                <MudPaper Class="pa-4 mb-8 w-40 fade-in-panel" Elevation="4" Style="height: 100%;">
+                    <EditForm Model="@model" OnValidSubmit="AddPassenger">
                         <DataAnnotationsValidator />
                         <MudText Typo="Typo.h5" Class="mb-4">Passenger Information</MudText>
 
                         <!-- Passenger Name -->
-                        <MudTextField Label="Passenger Name" @bind-Value="modelOut.PassengerName" ReadOnly="true" Required="true" Class="mb-3" />
+                        <MudTextField Label="Passenger Name"
+                                      @bind-Value="model.PassengerName"
+                                      Required="true"
+                                      Class="mb-3" />
 
                         <!-- Passport Number -->
-                        <MudTextField Label="Passport Number" @bind-Value="modelOut.Passport" ReadOnly="true" Required="true" Class="mb-3" />
+                        <MudTextField Label="Passport Number"
+                                      @bind-Value="model.Passport"
+                                      Required="true"
+                                      Class="mb-3" />
 
                         <!-- Gender -->
-                        <MudSelect T="string" Label="Gender" @bind-Value="modelOut.Gender" ReadOnly="true" Required="true" Class="mb-3">
+                        <MudSelect T="string"
+                                   Label="Gender"
+                                   @bind-Value="model.Gender"
+                                   Required="true"
+                                   Class="mb-3">
                             <MudSelectItem Value="@gender[0]">Male</MudSelectItem>
                             <MudSelectItem Value="@gender[1]">Female</MudSelectItem>
                         </MudSelect>
 
                         <!-- Birth Date -->
-                        <MudDatePicker Label="Date of Birth" @bind-Date="pickedDateForExisting" ReadOnly="true" Required="true" Class="mb-3" />
+                        <MudDatePicker Label="Date of Birth"
+                                       @bind-Date="pickedDate"
+                                       Required="true"
+                                       Class="mb-3" />
 
                         <!-- Nationality -->
-                        <MudTextField Label="Nationality" @bind-Value="modelOut.Nationality" ReadOnly="true" Required="true" Class="mb-3" />
+                        <MudTextField Label="Nationality"
+                                      @bind-Value="model.Nationality"
+                                      Required="true"
+                                      Class="mb-3" />
 
-                        <MudText Typo="Typo.h6" Class="mt-4 mb-4">Selected Flight: @FlightNo</MudText>
+                        <!-- Flight No -->
+                        <MudText Typo="Typo.h6" Class="mt-4 mb-4">
+                            Selected Flight: @FlightNo
+                        </MudText>
 
-                        <!-- Buttons -->
+                        <!-- BUTTONS -->
                         <MudItem xs="12" Class="d-flex justify-center mt-6">
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" ButtonType="ButtonType.Submit" Size="Size.Medium">Add Passenger</MudButton>
-                            <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty" OnClick="NavigateToSeatBooking">CHOOSE YOUR SEAT</MudButton>
-                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Class="mx-2"
+                                       ButtonType="ButtonType.Submit"
+                                       Size="Size.Medium">
+                                Add Passenger
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Size="Size.Medium"
+                                       Color="Color.Tertiary"
+                                       Class="mx-2"
+                                       Disabled="@isPassengerListEmpty"
+                                       OnClick="NavigateToSeatBooking">
+                                CHOOSE YOUR SEAT
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Class="mx-2"
+                                       OnClick="NavigateBack"
+                                       Size="Size.Medium">
+                                Cancel
+                            </MudButton>
+                        </MudItem>
+                    </EditForm>
+                </MudPaper>
+            </MudTabPanel>
+
+            <MudTabPanel Text="Existing">
+                <MudItem xs="12">
+                    <MudSelect T="PassengerOutputDTO"
+                               Label="Select Passenger"
+                               FullWidth="true"
+                               Value="selectedPassenger"
+                               Required="true"
+                               ValueChanged="OnPassengerSelected"
+                               SelectedValueFunc="GetPassengerDisplayText"
+                               Placeholder="Select Passenger">
+                        @foreach (var passenger in passengers)
+                        {
+                            <MudSelectItem Value="@passenger">
+                                Name: @passenger.PassengerName | Passport: @passenger.Passport
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudPaper Class="pa-4 mb-8 w-40 fade-in-panel" Elevation="4" Style="height: 100%;">
+                    <EditForm Model="@modelOut" OnValidSubmit="AddExistingPassenger">
+                        <DataAnnotationsValidator />
+                        <MudText Typo="Typo.h5" Class="mb-4">Passenger Information</MudText>
+
+                        <!-- Passenger Name -->
+                        <MudTextField Label="Passenger Name"
+                                      @bind-Value="modelOut.PassengerName"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Class="mb-3" />
+
+                        <!-- Passport Number -->
+                        <MudTextField Label="Passport Number"
+                                      @bind-Value="modelOut.Passport"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Class="mb-3" />
+
+                        <!-- Gender -->
+                        <MudSelect T="string"
+                                   Label="Gender"
+                                   @bind-Value="modelOut.Gender"
+                                   ReadOnly="true"
+                                   Required="true"
+                                   Class="mb-3">
+                            <MudSelectItem Value="@gender[0]">Male</MudSelectItem>
+                            <MudSelectItem Value="@gender[1]">Female</MudSelectItem>
+                        </MudSelect>
+
+                        <!-- Birth Date -->
+                        <MudDatePicker Label="Date of Birth"
+                                       @bind-Date="pickedDateForExisting"
+                                       ReadOnly="true"
+                                       Required="true"
+                                       Class="mb-3" />
+
+                        <!-- Nationality -->
+                        <MudTextField Label="Nationality"
+                                      @bind-Value="modelOut.Nationality"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Class="mb-3" />
+
+                        <!-- Flight No -->
+                        <MudText Typo="Typo.h6" Class="mt-4 mb-4">
+                            Selected Flight: @FlightNo
+                        </MudText>
+
+                        <!-- BUTTONS -->
+                        <MudItem xs="12" Class="d-flex justify-center mt-6">
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Class="mx-2"
+                                       ButtonType="ButtonType.Submit"
+                                       Size="Size.Medium">
+                                Add Passenger
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Size="Size.Medium"
+                                       Color="Color.Tertiary"
+                                       Class="mx-2"
+                                       Disabled="@isPassengerListEmpty"
+                                       OnClick="NavigateToSeatBooking">
+                                CHOOSE YOUR SEAT
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Class="mx-2"
+                                       OnClick="NavigateBack"
+                                       Size="Size.Medium">
+                                Cancel
+                            </MudButton>
                         </MudItem>
                     </EditForm>
                 </MudPaper>
             </MudTabPanel>
         </MudTabs>
-        <!-- Right: Passenger List -->
-        <div class="w-50" style="max-height: 80vh; overflow-y: auto;">
+
+        <!-- RIGHT: PASSENGER LIST -->
+        <div class="w-50 fade-in-panel" style="max-height: 80vh; overflow-y: auto;">
             <MudText Typo="Typo.h5" Class="mb-4 text-center">Passengers</MudText>
             @if (passengerList.Count > 0)
             {
@@ -119,62 +234,59 @@
                         <MudTd>@context.BirthDate.ToDateTime(TimeOnly.MinValue).ToString("dd/MM/yyyy")</MudTd>
                         <MudTd>@context.Nationality</MudTd>
                         <MudTd>
-                            <MudButton Icon="Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemovePassenger(context))">Remove</MudButton>
+                            <MudButton Icon="Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       OnClick="@(() => RemovePassenger(context))">
+                                Remove
+                            </MudButton>
                         </MudTd>
                     </RowTemplate>
                 </MudTable>
             }
             else
             {
-                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">No passengers added yet.</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="text-center">
+                    No passengers added yet.
+                </MudText>
             }
         </div>
     </div>
 </MudContainer>
 
+<!-- SNACKBAR PROVIDER -->
 <MudSnackbarProvider />
-@code {
 
+@code {
     [Parameter]
     public string FlightNo { get; set; }
+
+    // Basic Fields
     bool success;
     private DateTime? pickedDate = null;
     private DateTime? pickedDateForExisting = null;
     public string[] gender = new string[2] { "Male", "Female" };
-    private PassengerInputDTOs model = new PassengerInputDTOs();
-    private PassengerOutputDTO modelOut = new PassengerOutputDTO();
+
+    // Models
+    private PassengerInputDTOs model = new();
+    private PassengerOutputDTO modelOut = new();
     private List<PassengerInputDTOs> passengerList = new();
     private bool isPassengerListEmpty = true;
+
+    // Services / Auth
     public int userId { get; set; }
-    private List<PassengerOutputDTO> passengers = new List<PassengerOutputDTO>();
-    private PassengerOutputDTO selectedPassenger = new PassengerOutputDTO();
+    private List<PassengerOutputDTO> passengers = new();
+    private PassengerOutputDTO selectedPassenger = new();
     private string? Token;
-    private User user = new User();
+    private User user = new();
+
     protected override void OnInitialized()
     {
+        // Clear any previous passenger or seat selections
         appState.PassengersInput.Clear();
         appState.SelectedSeats.Clear();
         GetPassengerProfile();
     }
-    private string GetPassengerDisplayText(PassengerOutputDTO passenger)
-    {
-        return passenger != null
-            ? $"Name: {passenger.PassengerName} | Passport: ({passenger.Passport})"
-            : "Select a passenger";
-    }
-    private void OnPassengerSelected(PassengerOutputDTO passenger)
-    {
-        if (passenger != null)
-        {
-            selectedPassenger = passenger;
-            // Update the model with the selected passenger's information
-            modelOut.PassengerName = passenger.PassengerName;
-            modelOut.Passport = passenger.Passport;
-            modelOut.Gender = passenger.Gender;
-            pickedDateForExisting = passenger.BirthDate.ToDateTime(TimeOnly.MinValue);
-            modelOut.Nationality = passenger.Nationality;
-        }
-    }
+
     private void GetPassengerProfile()
     {
         Token = httpContextAccessor.HttpContext?.Request.Cookies["authToken"];
@@ -185,46 +297,66 @@
             {
                 userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
                 user = userService.GetUserByIdWithRelatedData(userId);
+
+                // Retrieve passenger profiles for the logged-in user
                 passengers = passengerService.GetPassengerProfile(userId);
             }
         }
     }
+
+    private string GetPassengerDisplayText(PassengerOutputDTO passenger)
+    {
+        return passenger != null
+            ? $"Name: {passenger.PassengerName} | Passport: ({passenger.Passport})"
+            : "Select a passenger";
+    }
+
+    private void OnPassengerSelected(PassengerOutputDTO passenger)
+    {
+        if (passenger != null)
+        {
+            selectedPassenger = passenger;
+            modelOut.PassengerName = passenger.PassengerName;
+            modelOut.Passport = passenger.Passport;
+            modelOut.Gender = passenger.Gender;
+            pickedDateForExisting = passenger.BirthDate.ToDateTime(TimeOnly.MinValue);
+            modelOut.Nationality = passenger.Nationality;
+        }
+    }
+
     private void AddPassenger(EditContext context)
     {
         success = true;
-        // Add the current passenger to the list
         passengerList.Add(new PassengerInputDTOs
-            {
-                PassengerName = model.PassengerName,
-                Passport = model.Passport,
-                Gender = model.Gender,
-                BirthDate = DateOnly.FromDateTime((DateTime)pickedDate),
-                Nationality = model.Nationality
-            });
+        {
+            PassengerName = model.PassengerName,
+            Passport = model.Passport,
+            Gender = model.Gender,
+            BirthDate = DateOnly.FromDateTime((DateTime)pickedDate),
+            Nationality = model.Nationality
+        });
 
-        // Clear the form by resetting the current passenger object
-        model = new PassengerInputDTOs(); // Clears the form fields for new entry
+        // Clear form
+        model = new PassengerInputDTOs();
         isPassengerListEmpty = false;
-        // Force UI to re-render to show updated list
         StateHasChanged();
     }
+
     private void AddExistingPassenger(EditContext context)
     {
         success = true;
-        // Add the current passenger to the list
         passengerList.Add(new PassengerInputDTOs
-            {
-                PassengerName = modelOut.PassengerName,
-                Passport = modelOut.Passport,
-                Gender = modelOut.Gender,
-                BirthDate = DateOnly.FromDateTime((DateTime)pickedDateForExisting),
-                Nationality = modelOut.Nationality
-            });
+        {
+            PassengerName = modelOut.PassengerName,
+            Passport = modelOut.Passport,
+            Gender = modelOut.Gender,
+            BirthDate = DateOnly.FromDateTime((DateTime)pickedDateForExisting),
+            Nationality = modelOut.Nationality
+        });
 
-        // Clear the form by resetting the current passenger object
-        model = new PassengerInputDTOs(); // Clears the form fields for new entry
+        // Clear form
+        modelOut = new PassengerOutputDTO();
         isPassengerListEmpty = false;
-        // Force UI to re-render to show updated list
         StateHasChanged();
     }
 
@@ -235,14 +367,13 @@
         {
             isPassengerListEmpty = true;
         }
-        StateHasChanged(); // Ensure UI updates when a passenger is removed
+        StateHasChanged();
     }
 
     private void NavigateToSeatBooking()
     {
         appState.PassengersInput.AddRange(passengerList);
         appState.NotifyStateChanged();
-        
         NavManager.NavigateTo($"/seatBooking?flightNo={FlightNo}");
     }
 
@@ -251,3 +382,160 @@
         NavManager.NavigateTo("/flights");
     }
 }
+
+<style>
+
+
+/********************************************************
+ * CORE COLORS / VARIABLES
+ ********************************************************/
+:root {
+    --white-bg: #ffffff;
+    --accent-blue: #3B82F6; /* lighter shade of blue */
+    --accent-orange: #FFA500;
+    --text-color: #333333;
+    --light-gray: #f9f9f9;
+}
+
+/********************************************************
+ * BODY / GLOBAL
+ ********************************************************/
+body {
+    margin-top: -64px;
+    min-height: 100vh;
+    background: var(--white-bg);
+    font-family: "Nunito", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+}
+
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* The app bar (if absolute + transparent) will be on top of this. */
+}
+
+.custom-carousel {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+.custom-carousel-item {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+/* The main image covers the entire area. */
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Pseudo-element to fade out bottom if desired. */
+.custom-carousel-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide. */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff; /* White text since we're on top of an image */
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.text-title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.text-subtitle {
+    font-size: 1.4rem;
+    font-weight: 400;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/********************************************************
+ * MAIN CONTAINER: "FROSTED GLASS"
+ ********************************************************/
+.main-container {
+    margin: -120px auto 50px; /* Overlaps carousel. Adjust as needed. */
+    padding: 30px;
+    max-width: 1200px;
+
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.5s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * OPTIONAL UTILITY CLASSES
+ ********************************************************/
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+.mb-6 {
+    margin-bottom: 2rem !important;
+}
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+.mt-6 {
+    margin-top: 2rem !important;
+}
+.text-center {
+    text-align: center;
+}
+</style>

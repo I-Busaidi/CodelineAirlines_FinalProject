@@ -13,56 +13,80 @@
 
 @attribute [Authorize(Roles = "user")]
 
-<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+<!-- 1) Carousel Section (Hero at Top) -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <div class="custom-carousel-item">
+            <!-- Replace with your desired image -->
+            <img src="/Images/backgroundCarousel2.jpg" class="carousel-image" />
+            <div class="text-overlay">
+                <h1 class="text-title">Confirm Your Booking</h1>
+                <p class="text-subtitle">Secure Your Flight &amp; Enjoy Your Journey</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2) Main Container Overlapping the Carousel -->
+<MudContainer Class="main-container fade-in-panel" MaxWidth="MaxWidth.Medium" Style="color:#546E7A">
     <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Checkout</MudText>
+
     <MudGrid Spacing="12" Class="mt-16">
+        <!-- LEFT COLUMN: Booking Info Form -->
         <MudItem xs="7">
             <MudText Typo="Typo.h5" GutterBottom="true">Booking info</MudText>
             <MudGrid>
-            @foreach(var booking in bookings)
-            {
-            
-                <MudItem xs="12">
-                    <MudTextField T="int" ReadOnly="true" Label="Flight Number" Value="@booking.FlightNo"/>
-                </MudItem>
-                <MudItem xs="12">
+                @foreach(var booking in bookings)
+                {
+                    <MudItem xs="12">
+                        <MudTextField T="int" ReadOnly="true" Label="Flight Number" Value="@booking.FlightNo"/>
+                    </MudItem>
+                    <MudItem xs="12">
                         <MudTextField T="string" ReadOnly="true" Label="Passenger Passport" Value="@booking.PassengerPassport" />
-                </MudItem>
-                <MudItem xs="6">
+                    </MudItem>
+                    <MudItem xs="6">
                         <MudTextField T="string" ReadOnly="true" Label="Class" Value="@booking.Class" />
-                </MudItem>
-                <MudItem xs="6">
+                    </MudItem>
+                    <MudItem xs="6">
                         <MudTextField T="string" ReadOnly="true" Label="Seat Number" Value="@booking.SeatNo" />
-                </MudItem>
-                <MudItem xs="12">
+                    </MudItem>
+                    <MudItem xs="12">
                         <MudSelect T="string" @bind-Value="@booking.Meal"
-                               Variant="Variant.Filled"
-                               Label="Meal"
-                               Margin="Margin.Normal"
-                               Dense="false"
-                               Disabled="false"
-                               ReadOnly="false"
-                               Placeholder="Select meal"
-                               Clearable="false"
-                               Required="true">
-                        @foreach (var meal in meals)
-                        {
-                            <MudSelectItem Value="meal">@meal</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
+                                   Variant="Variant.Filled"
+                                   Label="Meal"
+                                   Margin="Margin.Normal"
+                                   Dense="false"
+                                   Disabled="false"
+                                   ReadOnly="false"
+                                   Placeholder="Select meal"
+                                   Clearable="false"
+                                   Required="true">
+                            @foreach (var meal in meals)
+                            {
+                                <MudSelectItem Value="meal">@meal</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                }
 
-                
-            
-            }
                 <MudItem xs="12" Class="d-flex justify-center">
-                    <MudButton Variant="Variant.Filled" DropShadow="false" Color="Color.Primary" Size="Size.Large" Class="mt-8" OnClick="ConfirmBookings">Confirm Booking</MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               DropShadow="false"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               Class="mt-8"
+                               OnClick="ConfirmBookings">
+                        Confirm Booking
+                    </MudButton>
                 </MudItem>
             </MudGrid>
         </MudItem>
+
+        <!-- RIGHT COLUMN: Summary of Passengers + Selected Seats + Total Price -->
         <MudItem xs="5">
             <MudText Typo="Typo.h5" GutterBottom="true"></MudText>
             <MudPaper Class="d-flex flex-column" Style="height:100%;" Outlined="true">
+                <!-- Passenger List -->
                 <MudList T="string">
                     @foreach (var passenger in appState.PassengersInput)
                     {
@@ -74,7 +98,8 @@
                         </MudListItem>
                     }
                 </MudList>
-               
+
+                <!-- Selected Seats -->
                 <MudList T="string">
                     @foreach (var seat in SeatSelectionService.SelectedSeats)
                     {
@@ -86,6 +111,8 @@
                         </MudListItem>
                     }
                 </MudList>
+
+                <!-- Total Price -->
                 <div class="mt-auto">
                     <MudDivider />
                     <div class="d-flex pa-4">
@@ -98,8 +125,7 @@
     </MudGrid>
 </MudContainer>
 
-@code
-{
+@code {
     [Parameter]
     public string flightNo { get; set; }
     public List<BookingDTO> bookings = new List<BookingDTO>();
@@ -107,13 +133,17 @@
     public Models.Flight flight = new Models.Flight();
     public decimal totalPrice = 0;
     public User user = new User();
-    const decimal EconomyClassPercentage = 0.00m; // 0% for Economy
+
+    const decimal EconomyClassPercentage = 0.00m;  // 0% for Economy
     const decimal BusinessClassPercentage = 0.05m; // 5% for Business
-    const decimal FirstClassPercentage = 0.10m; // 10% for First Class
-    const decimal SeatSelectionPercentage = 0.03m; // 3% for seat selection
+    const decimal FirstClassPercentage = 0.10m;    // 10% for First Class
+    const decimal SeatSelectionPercentage = 0.03m; // 3% seat selection fee
+
     private string? Token;
+
     protected override void OnInitialized()
     {
+        // Retrieve user from token
         Token = HttpContextAccessor.HttpContext?.Request.Cookies["authToken"];
         if (!string.IsNullOrWhiteSpace(Token))
         {
@@ -128,21 +158,27 @@
             }
         }
 
+        // Get flight details
         flight = flightService.GetFlightByIdWithRelatedData(int.Parse(flightNo));
 
+        // Prepare booking info if seat count matches passenger count
         if (appState.PassengersInput.Count == SeatSelectionService.SelectedSeats.Count)
         {
             for (int i = 0; i < appState.PassengersInput.Count; i++)
             {
                 bookings.Add(new BookingDTO
-                    {
-                        PassengerPassport = appState.PassengersInput[i].Passport,
-                        FlightNo = int.Parse(flightNo),
-                        Class = SeatSelectionService.SelectedSeats[i].Type,
-                        SeatNo = SeatSelectionService.SelectedSeats[i].SeatNumber,
-                        LoyaltyPointsToUse = 0
-                    });
+                {
+                    PassengerPassport = appState.PassengersInput[i].Passport,
+                    FlightNo = int.Parse(flightNo),
+                    Class = SeatSelectionService.SelectedSeats[i].Type,
+                    SeatNo = SeatSelectionService.SelectedSeats[i].SeatNumber,
+                    LoyaltyPointsToUse = 0
+                });
+
+                // Base cost per passenger
                 totalPrice += flight.Cost;
+
+                // Additional fees based on seat type
                 if (SeatSelectionService.SelectedSeats[i].Type == "First Class")
                 {
                     totalPrice += totalPrice * FirstClassPercentage;
@@ -151,6 +187,8 @@
                 {
                     totalPrice += totalPrice * BusinessClassPercentage;
                 }
+
+                // Seat selection fee
                 totalPrice += totalPrice * SeatSelectionPercentage;
             }
         }
@@ -158,15 +196,184 @@
 
     public void ConfirmBookings()
     {
-        foreach(var booking in bookings)
+        foreach (var booking in bookings)
         {
             var passenger = passengerService.GetPassengerByPassport(booking.PassengerPassport);
-            if(passenger == null)
+
+            // If passenger doesn't exist yet, add them
+            if (passenger == null)
             {
-                passengerService.AddPassenger(appState.PassengersInput.FirstOrDefault(p => p.Passport == booking.PassengerPassport), user.UserId, false);
+                passengerService.AddPassenger(
+                    appState.PassengersInput.FirstOrDefault(p => p.Passport == booking.PassengerPassport),
+                    user.UserId,
+                    false
+                );
             }
+
+            // Book flight
             bookingService.BookFlight(booking);
         }
+
+        // Navigate to "bookings" page (or wherever your final step is)
         NavigationManager.NavigateTo("/bookings");
     }
 }
+
+<style>
+/* 
+   1) Ensure you have the Nunito font globally imported 
+      in _Host.cshtml or index.html, e.g.:
+      
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet"
+      />
+*/
+
+/********************************************************
+ * CORE COLORS / VARIABLES
+ ********************************************************/
+:root {
+    --white-bg: #ffffff;
+    --accent-blue: #3B82F6;  /* lighter shade of blue */
+    --accent-orange: #FFA500;
+    --text-color: #333333;
+    --light-gray: #f9f9f9;
+}
+
+/********************************************************
+ * BODY / GLOBAL
+ ********************************************************/
+body {
+        margin-top: -64px;
+        min-height: 100vh;
+    background: var(--white-bg);
+    font-family: "Nunito", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+}
+
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(59, 130, 246, 0.7),
+        rgba(255, 165, 0, 0.2)
+    );
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.custom-carousel-item {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Pseudo-element to fade out the bottom of the image if desired. */
+.custom-carousel-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%; /* adjust fade height as needed */
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--white-bg);
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.text-title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.text-subtitle {
+    font-size: 1.4rem;
+    font-weight: 400;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/********************************************************
+ * MAIN CONTAINER
+ ********************************************************/
+.main-container {
+    margin: -120px auto 50px; /* overlap the carousel */
+    padding: 30px;
+    max-width: 1200px;
+
+    background: rgba(255, 255, 255, 0.6); /* frosted glass style */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.5s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * OPTIONAL UTILITY CLASSES
+ ********************************************************/
+.mt-16 {
+    margin-top: 4rem !important;
+}
+.ml-auto {
+    margin-left: auto !important;
+}
+.d-flex {
+    display: flex !important;
+}
+.justify-center {
+    justify-content: center !important;
+}
+</style>

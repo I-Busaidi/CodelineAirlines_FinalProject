@@ -5,12 +5,44 @@
 @inject ICompoundService compoundService
 @inject NavigationManager NavigationManager
 @using MudBlazor
+
 @* @attribute [Authorize(Roles = "admin")] *@
-<MudContainer Class="edit-flight-container">
-    <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-4">Edit Flight</MudText>
+
+<!-- 1) Fading Hero Carousel at the Top -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="true"
+                     AutoCycleTime="TimeSpan.FromMilliseconds(2000)"
+                     Style="height: 500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarousel Class="mud-carousel"
+                         AutoCycle="false"
+                         Style="height: 500px; width: 100vw;"
+                         TData="object"
+                         Transition="@Transition.Fade">
+                <MudCarouselItem Color="@Color.Primary">
+                    <div class="carousel-item-content">
+                        <MudImage Src="/Images/background5.jpg" Class="carousel-image" />
+                        <div class="text-overlay">
+                            <h2>Editing Flight..</h2>
+                        </div>
+                    </div>
+                </MudCarouselItem>
+            </MudCarousel>
+        </MudCarousel>
+    </div>
+</div>
+
+<!-- 2) Frosted-Glass Container Overlapping the Carousel -->
+<MudContainer Class="edit-flight-container fade-in-panel">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-4">
+        Edit Flight
+    </MudText>
 
     <MudForm @ref="flightForm" OnValidSubmit="HandleValidSubmit">
-        <!-- Airplane ID -->
+        <!-- Airplane ID (Select) -->
         <MudGrid>
             <MudItem xs="12">
                 <MudSelect T="AirplaneOutputDto"
@@ -19,33 +51,41 @@
                            Label="Airplane"
                            Margin="Margin.None"
                            Dense="false"
-                           ReadOnly="false"
                            Required="true"
-                           Placeholder="@("Select Airplane")"
+                           Placeholder="Select Airplane"
                            ValueChanged="OnAirplaneSelected">
                     @foreach (var airplane in airplanes)
                     {
-                        string choiceItem = $"ID: {airplane.AirplaneId}| Model: {airplane.AirplaneModel}| Manufactured on: {airplane.ManufactureDate}";
+                        string choiceItem = $"ID: {airplane.AirplaneId} | Model: {airplane.AirplaneModel} | Manufactured: {airplane.ManufactureDate}";
                         <MudSelectItem Value="airplane">@choiceItem</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
         </MudGrid>
 
-        <!-- Scheduled Departure Date -->
+        <!-- Scheduled Departure Date & Time -->
         <MudGrid>
             <MudItem xs="12">
-                <MudDatePicker Label="Scheduled Departure Date" @bind-Date="dateInput" Required="true" Class="mb-3" />
+                <MudDatePicker Label="Scheduled Departure Date"
+                               @bind-Date="dateInput"
+                               Required="true"
+                               Class="mb-3" />
             </MudItem>
             <MudItem xs="12">
-                <MudTimePicker Label="Scheduled Departure Time" @bind-Time="timeInput" Required="true" Class="mb-3" />
+                <MudTimePicker Label="Scheduled Departure Time"
+                               @bind-Time="timeInput"
+                               Required="true"
+                               Class="mb-3" />
             </MudItem>
         </MudGrid>
 
-        <!-- Submit Button -->
+        <!-- Save Button -->
         <MudGrid>
             <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleValidSubmit" FullWidth="true">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="HandleValidSubmit"
+                           FullWidth="true">
                     Save Changes
                 </MudButton>
             </MudItem>
@@ -54,9 +94,13 @@
 
     <MudSpacer />
 
+    <!-- Return Button -->
     <MudGrid Style="justify-content: center;" Class="mt-4">
         <MudItem xs="4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       OnClick="ReturnToPreviousPage"
+                       FullWidth="true">
                 Return
             </MudButton>
         </MudItem>
@@ -64,51 +108,178 @@
 </MudContainer>
 
 @code {
-    [Parameter] public string FlightNo { get; set; }
-    private List<AirplaneOutputDto> airplanes = new List<AirplaneOutputDto>();
+    [Parameter]
+    public string FlightNo { get; set; }
+
+    private List<AirplaneOutputDto> airplanes = new();
     private AirplaneOutputDto selectedAirplane;
     private DateTime? dateInput = null;
     private TimeSpan? timeInput = null;
-    private FlightInputDTO flightInput = new FlightInputDTO();
+    private FlightInputDTO flightInput = new();
     private MudForm flightForm;
     private Models.Flight flight = new Models.Flight();
-    // Load flight details when the page is initialized
+
     protected override void OnInitialized()
     {
+        // Load the existing flight and relevant airplanes
         flight = flightService.GetFlightByIdWithRelatedData(int.Parse(FlightNo));
-        airplanes = airplaneService.GetAll().Where(a => a.CurrentAirportId == flight.SourceAirportId).ToList();
+        airplanes = airplaneService
+            .GetAll()
+            .Where(a => a.CurrentAirportId == flight.SourceAirportId)
+            .ToList();
     }
+
     private void OnAirplaneSelected(AirplaneOutputDto airplane)
     {
         selectedAirplane = airplane;
     }
-    // Handle form submission to update flight details
+
     private void HandleValidSubmit()
     {
         try
         {
             if (flight != null)
             {
-                // Populate the form with existing flight details
+                // Populate the form with chosen airplane & schedule
                 flightInput.AirplaneId = selectedAirplane.AirplaneId;
                 flightInput.ScheduledDepartureDate = dateInput.Value.Add(timeInput.Value);
             }
-            // Call the service to update the flight details (only AirplaneId and ScheduledDepartureDate)
-            compoundService.RescheduleFlight(int.Parse(FlightNo), flightInput.ScheduledDepartureDate, flightInput.AirplaneId);
+            // Call the service to reschedule the flight
+            compoundService.RescheduleFlight(int.Parse(FlightNo),
+                                             flightInput.ScheduledDepartureDate,
+                                             flightInput.AirplaneId);
 
-            // Redirect to the flight list page (or success page)
-            NavigationManager.NavigateTo("/ViewFlightToAdmin"); 
+            // Redirect back to the flight list page
+            NavigationManager.NavigateTo("/ViewFlightToAdmin");
         }
         catch (Exception ex)
         {
-            // Handle any errors during submission
             Log.Error($"Error updating flight: {ex.Message}");
         }
     }
 
-    // Return to the previous page (flight list or home)
     private void ReturnToPreviousPage()
     {
-        NavigationManager.NavigateTo("/ViewFlightToAdmin"); // Navigate to the previous page (or home)
+        NavigationManager.NavigateTo("/ViewFlightToAdmin");
     }
 }
+
+<style>
+/* 
+   1) Import your chosen font (e.g., Nunito) globally if not done:
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet"
+      />
+*/
+
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fade out bottom portion of the image */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FROSTED-GLASS CONTAINER
+ ********************************************************/
+.edit-flight-container {
+    margin: -16% auto 50px; /* Overlaps the carousel */
+    max-width: 1200px;
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.7s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * SPACING / UTILS
+ ********************************************************/
+.mt-4 {
+    margin-top: 20px !important;
+}
+
+    body {
+        margin-top: -64px; /* Adjust if your app bar is pinned at top */
+        height: 100vh;
+    }
+</style>

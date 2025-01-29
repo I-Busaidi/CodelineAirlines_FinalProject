@@ -11,7 +11,7 @@
 @attribute [Authorize(Roles = "user")]
 
 <MudDrawerContainer>
-    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" OverlayAutoClose="false" Class="fixed-drawer" Style="height:90%; width: 15%">
+    <MudDrawer Open="true" Anchor="Anchor.End" Elevation="1" OverlayAutoClose="false" Class="fixed-drawer" Style="height:90%; width: 15%; color:#546E7A">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Selected Seats</MudText>
         </MudDrawerHeader>
@@ -35,20 +35,20 @@
     </MudDrawer>
     <MudMainContent Class="carousel-section">
         <MudText Typo="Typo.h6">First Class</MudText>
-        <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+        <MudCarousel Class="mud-width-full" Style="height:200px; color:#546E7A" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
             <MudCarouselItem Transition="Transition.Fade" Color="@Color.Primary">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                    <MudImage Src="/Images/first1.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
             <MudCarouselItem Transition="Transition.Fade" Color="@Color.Secondary">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                    <MudImage Src="/Images/first2.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
             <MudCarouselItem Transition="Transition.Fade">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Color="@Color.Primary" Size="@Size.Large" />
+                    <MudImage Src="/Images/first3.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
         </MudCarousel>
@@ -57,17 +57,17 @@
         <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
             <MudCarouselItem Transition="Transition.Fade" Color="@Color.Primary">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                    <MudImage Src="/Images/busi1.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
             <MudCarouselItem Transition="Transition.Fade" Color="@Color.Secondary">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                    <MudImage Src="/Images/busi2.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
             <MudCarouselItem Transition="Transition.Fade">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Color="@Color.Primary" Size="@Size.Large" />
+                    <MudImage Src="/Images/busi3.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
         </MudCarousel>
@@ -76,22 +76,22 @@
         <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
             <MudCarouselItem Transition="Transition.Fade" Color="@Color.Primary">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                    <MudImage Src="/Images/eco1.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
             <MudCarouselItem Transition="Transition.Fade" Color="@Color.Secondary">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Size="@Size.Large" />
+                    <MudImage Src="/Images/eco2.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
             <MudCarouselItem Transition="Transition.Fade">
                 <div class="d-flex" style="height:100%">
-                    <MudIcon Class="mx-auto my-auto" Icon="@Icons.Custom.Brands.MudBlazor" Color="@Color.Primary" Size="@Size.Large" />
+                    <MudImage Src="/Images/eco3.jpg" Class="carousel-image" />
                 </div>
             </MudCarouselItem>
         </MudCarousel>
     </MudMainContent>
-    <MudMainContent Class="seat-map">
+    <MudMainContent Class="seat-map" Style="color:#546E7A">
         <div class="seat-layout">
             
             <MudText Typo="Typo.h5"> Select Seats</MudText>
@@ -280,7 +280,7 @@
 
 <style>
     body {
-        background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('/images/background5.jpg');
+        background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('/images/seatmap.jpg');
         background-size: cover;
         background-position: center;
         height: 100vh;
@@ -387,6 +387,13 @@
         justify-content: center;
         cursor: pointer;
         color: white;
+    }
+
+    .carousel-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
     .window-seat {

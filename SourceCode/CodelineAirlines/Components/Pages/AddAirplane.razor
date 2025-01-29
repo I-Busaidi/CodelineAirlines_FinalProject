@@ -6,11 +6,37 @@
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
-<MudContainer Class="form-container">
+<!-- 1) Fading Hero Carousel at the Top -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="false"
+                     
+                     Style="height: 500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarouselItem Color="@Color.Primary">
+                <div class="carousel-item-content">
+                    <MudImage Src="/Images/background5.jpg" Class="carousel-image" />
+                    <div class="text-overlay">
+                        <h2>Add a New Airplane</h2>
+                    </div>
+                </div>
+            </MudCarouselItem>
+        </MudCarousel>
+    </div>
+</div>
+
+<!-- 2) Frosted-Glass Container Overlapping the Carousel -->
+<MudContainer Class="add-airplane-container fade-in-panel">
     <MudGrid>
         <!-- Select Airplane Model -->
         <MudItem xs="12">
-            <MudSelect T="string" Label="Select Airplane Model" FullWidth="true" @bind-Value="selectedModel" Required="true">
+            <MudSelect T="string"
+                       Label="Select Airplane Model"
+                       FullWidth="true"
+                       @bind-Value="selectedModel"
+                       Required="true">
                 @foreach (var model in airplaneModels)
                 {
                     <MudSelectItem Value="@model.Model">@model.Model</MudSelectItem>
@@ -20,24 +46,36 @@
 
         <!-- Select Airport -->
         <MudItem xs="12">
-            <MudSelect T="int" Label="Select Airport" FullWidth="true" @bind-Value="selectedAirportId" Required="true">
+            <MudSelect T="int"
+                       Label="Select Airport"
+                       FullWidth="true"
+                       @bind-Value="selectedAirportId"
+                       Required="true">
                 @foreach (var airport in airports)
                 {
-                    <MudSelectItem Value="@airport.AirportId">@airport.AirportName (@airport.City)</MudSelectItem>
+                    <MudSelectItem Value="@airport.AirportId">
+                        @airport.AirportName (@airport.City)
+                    </MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
 
         <!-- Manufacture Date -->
         <MudItem xs="12">
-            <MudDatePicker Label="Manufacture Date" @bind-Date="manufactureDate" Variant="Variant.Outlined" Required="true" />
+            <MudDatePicker Label="Manufacture Date"
+                           @bind-Date="manufactureDate"
+                           Variant="Variant.Outlined"
+                           Required="true" />
         </MudItem>
     </MudGrid>
 
-    <!-- Add Airplane Buttons -->
+    <!-- Add Airplane Button -->
     <MudGrid Class="mt-4">
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="manageAirplanes" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="manageAirplanes"
+                       FullWidth="true">
                 Add Airplane
             </MudButton>
         </MudItem>
@@ -49,8 +87,8 @@
     private int selectedAirportId;
     private DateTime? manufactureDate = null;
 
-    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
-    private List<AirplaneSpecOutputDTO> airplaneModels = new List<AirplaneSpecOutputDTO>();
+    private List<AirportOutputDTO> airports = new();
+    private List<AirplaneSpecOutputDTO> airplaneModels = new();
 
     protected override void OnInitialized()
     {
@@ -67,7 +105,7 @@
             Log.Error("Error initializing data: " + ex.Message);
         }
     }
-    // Return to the manageAirplanes page
+
     private void manageAirplanes()
     {
         try
@@ -80,22 +118,129 @@
             });
             NavigationManager.NavigateTo("/manageAirplanes");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Log.Error(ex.Message);
         }
-
     }
 }
 
 <style>
-    .form-container {
-        padding: 20px;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-    }
+/* 
+   1) Make sure your chosen font (e.g., Nunito) is imported globally, e.g.:
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet"
+      />
+*/
 
-    .mt-4 {
-        margin-top: 20px;
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fade out bottom portion of the image */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FROSTED-GLASS CONTAINER
+ ********************************************************/
+.add-airplane-container {
+    margin: -16% auto 50px; /* Overlaps the carousel */
+    max-width: 1200px;
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.7s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * UTILITY CLASSES
+ ********************************************************/
+.mt-4 {
+    margin-top: 20px !important;
+}
+
+    body {
+        margin-top: -64px; /* Adjust if your app bar is pinned at top */
+        height: 100vh;
     }
 </style>

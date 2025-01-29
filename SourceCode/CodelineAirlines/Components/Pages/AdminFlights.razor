@@ -5,8 +5,39 @@
 @inject IDialogService DialogService
 @inject ICompoundService compoundService
 @using MudBlazor
+
 @* @attribute [Authorize(Roles = "admin")] *@
-<MudContainer Class="search-container">
+
+<!-- 1) Fading Hero Carousel at the Top -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="true"
+                     AutoCycleTime="TimeSpan.FromMilliseconds(3000)"
+                     Style="height: 500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarousel Class="mud-carousel"
+                         AutoCycle="false"
+                         Style="height: 500px; width: 100vw;"
+                         TData="object"
+                         Transition="@Transition.Fade">
+                <MudCarouselItem Color="@Color.Primary">
+                    <div class="carousel-item-content">
+                        <MudImage Src="/Images/background5.jpg" Class="carousel-image" />
+                        <div class="text-overlay">
+                            <h2>Managing Flights..</h2>
+                        </div>
+                    </div>
+                </MudCarouselItem>
+            </MudCarousel>
+        </MudCarousel>
+    </div>
+</div>
+
+<!-- 2) Frosted-Glass Container Overlapping the Carousel -->
+<MudContainer Class="admin-flights-container fade-in-panel">
+    
     <!-- Search Bar -->
     <MudGrid>
         <MudItem xs="12">
@@ -26,7 +57,6 @@
         </MudItem>
     </MudGrid>
 
-
     <!-- Flight Expansion Panels (filtered by search query) -->
     <MudExpansionPanels>
         @foreach (var flight in filteredFlights)
@@ -42,8 +72,12 @@
                         <MudText><strong>Price:</strong> @flight.Cost OMR</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => EditFlight(flight))">Edit</MudButton>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteFlight(flight))">Delete</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => EditFlight(flight))">
+                            Edit
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteFlight(flight))">
+                            Delete
+                        </MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudExpansionPanel>
@@ -53,12 +87,18 @@
     <!-- Action Buttons (Add New Flight and Return) -->
     <MudGrid Style="justify-content: center;" Class="mt-4">
         <MudItem xs="4" Class="mr-2">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddNewFlight" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="AddNewFlight"
+                       FullWidth="true">
                 Add New Flight
             </MudButton>
         </MudItem>
         <MudItem xs="4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       OnClick="ReturnToPreviousPage"
+                       FullWidth="true">
                 Return
             </MudButton>
         </MudItem>
@@ -67,16 +107,22 @@
 
 @code {
     private string searchQuery = string.Empty;
-    private List<FlightOutputDTO> flights = new List<FlightOutputDTO>();
-    private List<FlightOutputDTO> filteredFlights = new List<FlightOutputDTO>();
+    private List<FlightOutputDTO> flights = new();
+    private List<FlightOutputDTO> filteredFlights = new();
 
-    // Method to trigger search and filter the flights
+    protected override void OnInitialized()
+    {
+        // Load all flights from the service
+        flights = flightService.GetAllFlights();
+        // By default, show flights with Status "Scheduled" or "ReScheduled"
+        filteredFlights = flights.Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList();
+    }
+
     private void OnSearchClicked()
     {
         FilterFlights();
     }
 
-    // Handle Enter key press to trigger search
     private void HandleSearchKeyUp(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -89,21 +135,25 @@
     {
         if (!string.IsNullOrEmpty(searchQuery))
         {
-            filteredFlights = flights.Where(f => (f.FlightNo.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                                  f.SourceAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                                                  f.DestinationAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-                                                    ) && (f.Status == "Scheduled" || f.Status == "ReScheduled")).ToList();
+            filteredFlights = flights
+                .Where(f =>
+                    (f.FlightNo.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                     || f.SourceAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                     || f.DestinationAirportName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                     && (f.Status == "Scheduled" || f.Status == "ReScheduled"))
+                .ToList();
         }
         else
         {
-            filteredFlights = flights; // If search query is empty, show all flights
+            filteredFlights = flights
+                .Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled")
+                .ToList();
         }
     }
 
-    // Example methods for edit and delete
     private void EditFlight(FlightOutputDTO flight)
     {
-        // Implement editing functionality (e.g., open a form to edit the flight)
+        // Navigate to edit page, or open a form to edit
         Log.Information($"Editing flight: {flight.FlightNo}");
         NavigationManager.NavigateTo($"/EditFlight/{flight.FlightNo}");
     }
@@ -113,10 +163,11 @@
         try
         {
             Log.Information($"Deleting flight: {flight.FlightNo}");
+
             var parameters = new DialogParameters<Dialog>
             {
                 {
-                    x=>x.flight, flight
+                    x => x.flight, flight
                 }
             };
 
@@ -127,84 +178,177 @@
             {
                 Guid.TryParse(result.Data.ToString(), out Guid deletedServer);
                 compoundService.CancelFlight(flight.FlightNo, "Weather Conditions");
-                // Perform delete action
                 Log.Information("Delete confirmed!");
-                flights = flightService.GetAllFlights(); // Get all flights from the service
-                filteredFlights = flights.Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList(); // Show all flights initially
+
+                // Refresh flights
+                flights = flightService.GetAllFlights();
+                filteredFlights = flights.Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList();
             }
             else
             {
                 Log.Information("Delete canceled.");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Log.Error(ex.Message);
         }
-
     }
 
-    // Load all flights when the component is initialized
-    protected override void OnInitialized()
-    {
-        flights = flightService.GetAllFlights(); // Get all flights from the service
-        filteredFlights = flights.Where(f => f.Status == "Scheduled" || f.Status == "ReScheduled").ToList(); // Show all flights initially
-    }
-
-    // Method to handle Add New Flight button click
     private void AddNewFlight()
     {
         // Navigate to a page or open a form to add a new flight
-        NavigationManager.NavigateTo("/AddFlight"); // Replace with your own route
+        NavigationManager.NavigateTo("/AddFlight");
     }
 
-    // Method to handle Return button click
     private void ReturnToPreviousPage()
     {
-        NavigationManager.NavigateTo("/AdminHomePage"); // Navigate to the previous page (or home)
+        NavigationManager.NavigateTo("/AdminHomePage");
     }
 }
 
 <style>
-    .search-container {
-        padding: 20px;
-        background-color: #f5f5f5;
-        border-radius: 8px;
+
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fade out bottom portion of the image */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FROSTED-GLASS CONTAINER
+ ********************************************************/
+.admin-flights-container {
+    margin: -16% auto 50px; /* Overlaps the carousel */
+    max-width: 1200px;
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .flight-card {
-        border: 2px solid #ddd; /* Adding a border around the card */
-        border-radius: 8px;
-        padding: 15px;
-        background-color: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease-in-out;
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
+}
 
-        .flight-card:hover {
-            transform: scale(1.05); /* Slight zoom effect on hover */
-        }
+.fade-in-panel {
+    animation: fadeInUp 0.7s ease-in-out forwards;
+    opacity: 0;
+}
 
-        .flight-card .mud-card-actions {
-            display: flex;
-            justify-content: space-between;
-        }
+/********************************************************
+ * FLIGHT CARD & SEARCH STYLING
+ ********************************************************/
+/* flight-card styling from your original code */
+.flight-card {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
 
-        .flight-card .mud-button {
-            width: 48%; /* Make buttons equal in width */
-        }
+.flight-card:hover {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+}
 
-    .mt-2 {
-        margin-top: 20px;
-    }
+.flight-card .mud-card-actions {
+    display: flex;
+    justify-content: space-between;
+}
 
-    .mt-4 {
-        margin-top: 20px;
-    }
+.flight-card .mud-button {
+    width: 48%; /* Make buttons equal in width */
+}
 
-    /* Panel header customization */
-    .mud-expansion-panel-header {
-        background-color: #f5f5f5;
-        font-weight: bold;
+/* Additional spacing utilities */
+.mt-4 {
+    margin-top: 20px !important;
+}
+.mr-2 {
+    margin-right: 10px !important;
+}
+
+/* Panel header customization */
+.mud-expansion-panel-header {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+    body {
+        margin-top: -64px; /* Adjust if your app bar is pinned at top */
+        height: 100vh;
     }
 </style>

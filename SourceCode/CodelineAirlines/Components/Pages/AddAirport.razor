@@ -4,10 +4,40 @@
 @inject NavigationManager NavigationManager
 @using MudBlazor
 
-<MudContainer Class="add-airport-container">
+<!-- 1) Fading Hero Carousel at the Top -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="true"
+                     AutoCycleTime="TimeSpan.FromMilliseconds(2000)"
+                     Style="height: 500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarousel Class="mud-carousel"
+                         AutoCycle="false"
+                         Style="height: 500px; width: 100vw;"
+                         TData="object"
+                         Transition="@Transition.Fade">
+                <MudCarouselItem Color="@Color.Primary">
+                    <div class="carousel-item-content">
+                        <MudImage Src="/Images/background5.jpg" Class="carousel-image" />
+                        <div class="text-overlay">
+                            <h2>Adding a new Airport</h2>
+                        </div>
+                    </div>
+                </MudCarouselItem>
+            </MudCarousel>
+        </MudCarousel>
+    </div>
+</div>
+
+<!-- 2) Frosted-Glass Container Overlapping the Carousel -->
+<MudContainer Class="add-airport-container fade-in-panel">
     <MudGrid>
         <MudItem xs="12">
-            <MudText Typo="Typo.h4" Class="mb-4">Add New Airport</MudText>
+            <MudText Typo="Typo.h4" Class="mb-4">
+                Add New Airport
+            </MudText>
         </MudItem>
 
         <!-- Airport Name Input -->
@@ -62,14 +92,14 @@
 
         try
         {
-            AirportControllerInputDTO newAirport = new AirportControllerInputDTO
-                {
-                    AirportName = airportName,
-                    City = city
-                };
+            var newAirport = new AirportControllerInputDTO
+            {
+                AirportName = airportName,
+                City = city
+            };
 
-            var response = compoundService.AddAirport(newAirport); // Call service to add airport
-            NavigationManager.NavigateTo("/AirportManagement"); // Redirect to management page
+            var response = compoundService.AddAirport(newAirport);
+            NavigationManager.NavigateTo("/AirportManagement");
         }
         catch (Exception ex)
         {
@@ -86,21 +116,127 @@
 }
 
 <style>
-    .add-airport-container {
-        padding: 20px;
-        background-color: #f5f5f5;
-        border-radius: 8px;
-    }
+/* 
+   1) Make sure your chosen font (e.g., Nunito) is imported globally in _Host.cshtml or index.html, for example:
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet"
+      />
+*/
 
-    .mb-4 {
-        margin-bottom: 16px;
-    }
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
 
-    .mt-4 {
-        margin-top: 20px;
-    }
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
 
-    .mt-2 {
-        margin-top: 10px;
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fade out bottom portion of the image */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FROSTED GLASS CONTAINER
+ ********************************************************/
+.add-airport-container {
+    margin: -16% auto 50px; /* Overlaps the carousel */
+    max-width: 1200px;
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.7s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * UTILITY CLASSES
+ ********************************************************/
+.mb-4 {
+    margin-bottom: 16px;
+}
+.mt-4 {
+    margin-top: 20px;
+}
+.mt-2 {
+    margin-top: 10px;
+}
+
+    body {
+        margin-top: -64px; /* Adjust if your app bar is pinned at top */
+        height: 100vh;
     }
 </style>

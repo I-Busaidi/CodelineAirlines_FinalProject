@@ -8,7 +8,36 @@
 @using MudBlazor
 
 @* @attribute [Authorize(Roles = "admin")] *@
-<MudContainer Class="add-flight-container">
+
+<!-- 1) Fading Hero Carousel at the Top -->
+<div class="carousel-container">
+    <div class="custom-carousel">
+        <MudCarousel Class="mud-carousel"
+                     AutoCycle="true"
+                     AutoCycleTime="TimeSpan.FromMilliseconds(2000)"
+                     Style="height: 500px; width: 100vw;"
+                     TData="object"
+                     Transition="@Transition.Fade">
+            <MudCarousel Class="mud-carousel"
+                         AutoCycle="false"
+                         Style="height: 500px; width: 100vw;"
+                         TData="object"
+                         Transition="@Transition.Fade">
+                <MudCarouselItem Color="@Color.Primary">
+                    <div class="carousel-item-content">
+                        <MudImage Src="/Images/background5.jpg" Class="carousel-image" />
+                        <div class="text-overlay">
+                            <h2>Adding a New Flight</h2>
+                        </div>
+                    </div>
+                </MudCarouselItem>
+            </MudCarousel>
+        </MudCarousel>
+    </div>
+</div>
+
+<!-- 2) Frosted-Glass Container Overlapping the Carousel -->
+<MudContainer Class="add-flight-container fade-in-panel">
     <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-4">Add New Flight</MudText>
 
     <MudForm @ref="flightForm" OnValidSubmit="HandleValidSubmit">
@@ -26,7 +55,6 @@
                            Required="true"
                            Placeholder="Select origin"
                            ValueChanged="OnOriginSelected">
-                           
                     @foreach (var airport in airportsOrigin)
                     {
                         string choiceItem = $"{airport.City}, {airport.Country}, {airport.AirportName}";
@@ -34,7 +62,6 @@
                     }
                 </MudSelect>
             </MudItem>
-            
         </MudGrid>
 
         <!-- Destination Airport -->
@@ -46,10 +73,9 @@
                            Label="Destination"
                            Margin="Margin.None"
                            Dense="false"
-                           ReadOnly="false"
                            Required="true"
                            Disabled="@originEmpty"
-                           Placeholder="@("Select Destination")"
+                           Placeholder="Select Destination"
                            ValueChanged="OnDestSelected">
                     @foreach (var airport in airportsDest)
                     {
@@ -72,11 +98,11 @@
                            ReadOnly="false"
                            Required="true"
                            Disabled="@originEmpty"
-                           Placeholder="@("Select Airplane")"
+                           Placeholder="Select Airplane"
                            ValueChanged="OnAirplaneSelected">
                     @foreach (var airplane in airplanes)
                     {
-                        string choiceItem = $"ID: {airplane.AirplaneId}| Model: {airplane.AirplaneModel}| Manufactured on: {airplane.ManufactureDate}";
+                        string choiceItem = $"ID: {airplane.AirplaneId} | Model: {airplane.AirplaneModel} | Manufactured: {airplane.ManufactureDate}";
                         <MudSelectItem Value="airplane">@choiceItem</MudSelectItem>
                     }
                 </MudSelect>
@@ -94,21 +120,29 @@
             </MudItem>
         </MudGrid>
 
-        
-        <!-- Scheduled Departure Date -->
+        <!-- Scheduled Departure Date & Time -->
         <MudGrid>
             <MudItem xs="12">
-                <MudDatePicker Label="Scheduled Departure Date" @bind-Date="dateInput" Required="true" Class="mb-3" />
+                <MudDatePicker Label="Scheduled Departure Date"
+                               @bind-Date="dateInput"
+                               Required="true"
+                               Class="mb-3" />
             </MudItem>
             <MudItem xs="12">
-                <MudTimePicker Label="Scheduled Departure Time" @bind-Time="timeInput" Required="true" Class="mb-3" />
+                <MudTimePicker Label="Scheduled Departure Time"
+                               @bind-Time="timeInput"
+                               Required="true"
+                               Class="mb-3" />
             </MudItem>
         </MudGrid>
 
         <!-- Submit Button -->
         <MudGrid>
             <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleValidSubmit" FullWidth="true">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="HandleValidSubmit"
+                           FullWidth="true">
                     Add Flight
                 </MudButton>
             </MudItem>
@@ -117,9 +151,13 @@
 
     <MudSpacer />
 
+    <!-- Return Button -->
     <MudGrid Style="justify-content: center;" Class="mt-4">
         <MudItem xs="4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnToPreviousPage" FullWidth="true">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       OnClick="ReturnToPreviousPage"
+                       FullWidth="true">
                 Return
             </MudButton>
         </MudItem>
@@ -127,42 +165,46 @@
 </MudContainer>
 
 @code {
-    private FlightControllerInput flightInput = new FlightControllerInput();
+    private FlightControllerInput flightInput = new();
     private MudForm flightForm;
     private DateTime? dateInput = null;
     private TimeSpan? timeInput = null;
-    private List<AirplaneOutputDto> airplanes = new List<AirplaneOutputDto>();
-    private List<AirportOutputDTO> airports = new List<AirportOutputDTO>();
-    private List<AirportOutputDTO> airportsOrigin = new List<AirportOutputDTO>();
-    private List<AirportOutputDTO> airportsDest = new List<AirportOutputDTO>();
+    private List<AirplaneOutputDto> airplanes = new();
+    private List<AirportOutputDTO> airports = new();
+    private List<AirportOutputDTO> airportsOrigin = new();
+    private List<AirportOutputDTO> airportsDest = new();
 
     protected override void OnInitialized()
     {
         airports = airportService.GetAllAirports();
         airportsOrigin = airports.ToList();
     }
+
     private AirportOutputDTO FromLocation;
     private AirportOutputDTO ToLocation;
     private AirplaneOutputDto selectedAirplane;
     bool originEmpty = true;
     bool destEmpty = true;
+
     private void OnOriginSelected(AirportOutputDTO airport)
     {
         if (airport != null)
         {
             FromLocation = airport;
-            // Filter destination airports, excluding the selected origin airport
+            // Filter destination airports, excluding the selected origin
             airportsDest = airports.Where(a => a.AirportName != FromLocation.AirportName).ToList();
-            airplanes = airplaneService.GetAll().Where(a => a.CurrentAirportId == FromLocation.AirportId).ToList();
+            // Filter airplanes based on the origin airport
+            airplanes = airplaneService.GetAll()
+                .Where(a => a.CurrentAirportId == FromLocation.AirportId)
+                .ToList();
             originEmpty = false;
 
-            // Optional: Log or update UI
             Console.WriteLine($"Origin selected: {FromLocation.City}, {FromLocation.Country}, {FromLocation.AirportName}");
         }
         else
         {
             originEmpty = true;
-            airportsDest = airports; // Reset to all airports
+            airportsDest = airports; // Reset
         }
     }
 
@@ -171,50 +213,166 @@
         if (airport != null)
         {
             ToLocation = airport;
-            // Filter destination airports, excluding the selected origin airport
             airportsOrigin = airports.Where(a => a.AirportName != ToLocation.AirportName).ToList();
             destEmpty = false;
 
-            // Optional: Log or update UI
             Console.WriteLine($"Destination selected: {ToLocation.City}, {ToLocation.Country}, {ToLocation.AirportName}");
         }
         else
         {
             destEmpty = true;
-            airportsOrigin = airports; // Reset to all airports
+            airportsOrigin = airports; // Reset
         }
     }
+
     private void OnAirplaneSelected(AirplaneOutputDto airplane)
     {
         selectedAirplane = airplane;
     }
-    // Handle form submission
+
     private async Task HandleValidSubmit()
     {
         try
         {
-            
             flightInput.AirplaneId = selectedAirplane.AirplaneId;
             flightInput.SourceAirportName = FromLocation.AirportName;
             flightInput.DestinationAirportName = ToLocation.AirportName;
             flightInput.ScheduledDepartureDate = dateInput.Value.Add(timeInput.Value);
 
-            // Call the service to add the new flight (implement this in your flight service)
+            // Calculate and add the new flight
             compoundService.ClaculateFlightInputDuration(flightInput);
 
-            // Redirect to the flight list page (or success page)
+            // Navigate back to flight list
             NavigationManager.NavigateTo("/ViewFlightToAdmin");
         }
         catch (Exception ex)
         {
-            // Handle any errors during submission (e.g., show a notification or error message)
             Log.Debug($"Error adding flight: {ex.Message}");
         }
     }
 
-    // Return to the previous page (home or flight list)
     private void ReturnToPreviousPage()
     {
         NavigationManager.NavigateTo("/ViewFlightToAdmin");
     }
 }
+
+<style>
+/* 
+   1) Ensure your chosen font (e.g. Nunito) is imported globally in _Host.cshtml or index.html, e.g.:
+
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap"
+        rel="stylesheet"
+      />
+*/
+
+/********************************************************
+ * CAROUSEL SECTION
+ ********************************************************/
+.carousel-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-carousel {
+    width: 100vw;
+    height: 500px;
+    position: relative;
+}
+
+.carousel-item-content {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fade out bottom portion */
+.carousel-item-content::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #ffffff 100%);
+    pointer-events: none;
+}
+
+/* Overlay text fade/slide up */
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    margin: 0 20px;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+.text-overlay h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+/********************************************************
+ * FROSTED-GLASS CONTAINER
+ ********************************************************/
+.add-flight-container {
+    margin: -16% auto 50px; /* Overlap the carousel */
+    max-width: 1200px;
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/********************************************************
+ * FADE-IN ANIMATION
+ ********************************************************/
+@@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-panel {
+    animation: fadeInUp 0.7s ease-in-out forwards;
+    opacity: 0;
+}
+
+/********************************************************
+ * UTILITY SPACING
+ ********************************************************/
+.mt-4 {
+    margin-top: 20px !important;
+}
+body {
+        margin-top: -64px; /* Adjust if your app bar is pinned at top */
+        height: 100vh;
+    }
+</style>

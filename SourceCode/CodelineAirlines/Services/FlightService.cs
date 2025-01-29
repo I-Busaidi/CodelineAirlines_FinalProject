@@ -5,6 +5,7 @@ using CodelineAirlines.Enums;
 using CodelineAirlines.Migrations;
 using CodelineAirlines.Models;
 using CodelineAirlines.Repositories;
+using Serilog;
 
 namespace CodelineAirlines.Services
 {
@@ -49,7 +50,7 @@ namespace CodelineAirlines.Services
 
             if (flights == null || flights.Count == 0)
             {
-                throw new InvalidOperationException("No flights found");
+                Log.Error("No flights found");
             }
 
             return _mapper.Map<List<FlightOutputDTO>>(flights);
