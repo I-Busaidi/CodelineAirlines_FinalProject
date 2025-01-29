@@ -1,6 +1,9 @@
 ﻿@page "/book-flight"
 @page "/book-flight/{FlightNo}"
-
+@inject IPassengerService passengerService
+@inject IUserService userService
+@inject IHttpContextAccessor httpContextAccessor
+@inject IMapper mapper
 @inject AppState appState
 @inject NavigationManager NavManager
 @attribute [Authorize(Roles = "user")]
@@ -14,7 +17,7 @@
     <div class="d-flex justify-content-between align-items-start" style="min-height: 100vh;">
         <!-- Left: Passenger Information Form (Smaller Size) -->
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-            <MudTabPanel Text="Tab One">
+            <MudTabPanel Text="New Passenger">
                 <MudPaper Class="pa-4 mb-8 w-40" Elevation="4" Style="height: 100%;">
                 <EditForm Model="@model" OnValidSubmit="AddPassenger">
                 <DataAnnotationsValidator />
@@ -46,11 +49,53 @@
                     <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty" OnClick="NavigateToSeatBooking">CHOOSE YOUR SEAT</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
                 </MudItem>
-            </EditForm>
-            </MudPaper>
+                </EditForm>
+                </MudPaper>
             </MudTabPanel>
-            <MudTabPanel Text="Tab Disabled" Disabled="false">
-                <MudText>Content Disabled</MudText>
+            <MudTabPanel Text="Existing" Disabled="false" >
+                <MudItem xs="12">
+                    <MudSelect T="PassengerOutputDTO" Label="Select Passenger" FullWidth="true"
+                               Value="selectedPassenger" Required="true" ValueChanged="OnPassengerSelected"
+                               SelectedValueFunc="GetPassengerDisplayText" Placeholder="Select Passenger">
+                        @foreach (var passenger in passengers)
+                        {
+                            <MudSelectItem Value="@passenger">Name: @passenger.PassengerName | Passport: @passenger.Passport</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudPaper Class="pa-4 mb-8 w-40" Elevation="4" Style="height: 100%;">
+                    <EditForm Model="@modelOut" OnValidSubmit="AddExistingPassenger">
+                        <DataAnnotationsValidator />
+                        <MudText Typo="Typo.h5" Class="mb-4">Passenger Information</MudText>
+
+                        <!-- Passenger Name -->
+                        <MudTextField Label="Passenger Name" @bind-Value="modelOut.PassengerName" ReadOnly="true" Required="true" Class="mb-3" />
+
+                        <!-- Passport Number -->
+                        <MudTextField Label="Passport Number" @bind-Value="modelOut.Passport" ReadOnly="true" Required="true" Class="mb-3" />
+
+                        <!-- Gender -->
+                        <MudSelect T="string" Label="Gender" @bind-Value="modelOut.Gender" ReadOnly="true" Required="true" Class="mb-3">
+                            <MudSelectItem Value="@gender[0]">Male</MudSelectItem>
+                            <MudSelectItem Value="@gender[1]">Female</MudSelectItem>
+                        </MudSelect>
+
+                        <!-- Birth Date -->
+                        <MudDatePicker Label="Date of Birth" @bind-Date="pickedDateForExisting" ReadOnly="true" Required="true" Class="mb-3" />
+
+                        <!-- Nationality -->
+                        <MudTextField Label="Nationality" @bind-Value="modelOut.Nationality" ReadOnly="true" Required="true" Class="mb-3" />
+
+                        <MudText Typo="Typo.h6" Class="mt-4 mb-4">Selected Flight: @FlightNo</MudText>
+
+                        <!-- Buttons -->
+                        <MudItem xs="12" Class="d-flex justify-center mt-6">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" ButtonType="ButtonType.Submit" Size="Size.Medium">Add Passenger</MudButton>
+                            <MudButton Variant="Variant.Filled" Size="Size.Medium" Color="Color.Tertiary" Class="mx-2" Disabled="@isPassengerListEmpty" OnClick="NavigateToSeatBooking">CHOOSE YOUR SEAT</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Class="mx-2" OnClick="NavigateBack" Size="Size.Medium">Cancel</MudButton>
+                        </MudItem>
+                    </EditForm>
+                </MudPaper>
             </MudTabPanel>
         </MudTabs>
         <!-- Right: Passenger List -->
@@ -94,17 +139,56 @@
     public string FlightNo { get; set; }
     bool success;
     private DateTime? pickedDate = null;
+    private DateTime? pickedDateForExisting = null;
     public string[] gender = new string[2] { "Male", "Female" };
     private PassengerInputDTOs model = new PassengerInputDTOs();
+    private PassengerOutputDTO modelOut = new PassengerOutputDTO();
     private List<PassengerInputDTOs> passengerList = new();
     private bool isPassengerListEmpty = true;
-
+    public int userId { get; set; }
+    private List<PassengerOutputDTO> passengers = new List<PassengerOutputDTO>();
+    private PassengerOutputDTO selectedPassenger = new PassengerOutputDTO();
+    private string? Token;
+    private User user = new User();
     protected override void OnInitialized()
     {
         appState.PassengersInput.Clear();
         appState.SelectedSeats.Clear();
+        GetPassengerProfile();
     }
-
+    private string GetPassengerDisplayText(PassengerOutputDTO passenger)
+    {
+        return passenger != null
+            ? $"Name: {passenger.PassengerName} | Passport: ({passenger.Passport})"
+            : "Select a passenger";
+    }
+    private void OnPassengerSelected(PassengerOutputDTO passenger)
+    {
+        if (passenger != null)
+        {
+            selectedPassenger = passenger;
+            // Update the model with the selected passenger's information
+            modelOut.PassengerName = passenger.PassengerName;
+            modelOut.Passport = passenger.Passport;
+            modelOut.Gender = passenger.Gender;
+            pickedDateForExisting = passenger.BirthDate.ToDateTime(TimeOnly.MinValue);
+            modelOut.Nationality = passenger.Nationality;
+        }
+    }
+    private void GetPassengerProfile()
+    {
+        Token = httpContextAccessor.HttpContext?.Request.Cookies["authToken"];
+        if (!string.IsNullOrWhiteSpace(Token))
+        {
+            var claims = JwtHelper.GetClaimsFromToken(Token);
+            if (claims != null)
+            {
+                userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+                user = userService.GetUserByIdWithRelatedData(userId);
+                passengers = passengerService.GetPassengerProfile(userId);
+            }
+        }
+    }
     private void AddPassenger(EditContext context)
     {
         success = true;
@@ -116,6 +200,25 @@
                 Gender = model.Gender,
                 BirthDate = DateOnly.FromDateTime((DateTime)pickedDate),
                 Nationality = model.Nationality
+            });
+
+        // Clear the form by resetting the current passenger object
+        model = new PassengerInputDTOs(); // Clears the form fields for new entry
+        isPassengerListEmpty = false;
+        // Force UI to re-render to show updated list
+        StateHasChanged();
+    }
+    private void AddExistingPassenger(EditContext context)
+    {
+        success = true;
+        // Add the current passenger to the list
+        passengerList.Add(new PassengerInputDTOs
+            {
+                PassengerName = modelOut.PassengerName,
+                Passport = modelOut.Passport,
+                Gender = modelOut.Gender,
+                BirthDate = DateOnly.FromDateTime((DateTime)pickedDateForExisting),
+                Nationality = modelOut.Nationality
             });
 
         // Clear the form by resetting the current passenger object

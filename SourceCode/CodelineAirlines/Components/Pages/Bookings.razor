@@ -15,7 +15,7 @@
         <MudExpansionPanels>
             @foreach (var booking in bookings)
             {
-                <MudExpansionPanel Text="@($"Flight: {booking.Flight.SourceAirport} → {booking.Flight.DestinationAirport} - Date: {booking.Flight.ScheduledDepartureDate:dd/MM/yyyy}")">
+                <MudExpansionPanel Text="@($"Flight: {booking.Flight.SourceAirport.City} → {booking.Flight.DestinationAirport.City} - Date: {booking.Flight.ScheduledDepartureDate:dd/MM/yyyy}")">
                     <MudPaper Class="pa-4">
                         <MudGrid>
                             <MudItem xs="8">
@@ -29,7 +29,7 @@
                             </MudItem>
                             <MudItem xs="4" Class="text-right">
                                 <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => DeleteBooking(booking.BookingId)">
-                                    Delete Booking
+                                    Cancel Booking
                                 </MudButton>
                             </MudItem>
                         </MudGrid>
@@ -87,12 +87,13 @@
         {
             // Call the service to delete the booking
             BookingService.CancelBooking(bookingId);
-            
+
             // Optionally refresh the bookings list
             foreach (var passenger in passengers)
             {
                 bookings = BookingService.GetBookingsForPassenger(passenger.Passport).ToList();
             }
+            StateHasChanged();
         }
         catch (Exception ex)
         {
