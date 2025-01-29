@@ -2,6 +2,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IAirplaneSpecService airplaneSpecService
+@inject ICompoundService compoundService
 @inject IMapper mapper
 @inject IFlightService flightService
 @inject SeatSelectionService SeatSelectionService
@@ -104,7 +105,7 @@
                         <div class="seat-row">
                             @foreach (var seat in row)
                             {
-                                var seatClassName = $"seat-icon {GetSeatClass(seat.SeatLocation)}";
+                                var seatClassName = $"seat-icon {GetSeatClass(seat.SeatLocation)} {(IsSeatAvailable(seat.SeatNumber) ? "" : "unavailable-seat")}";
 
                                 @if (seat.SeatLocation == -1)
                                 {
@@ -118,7 +119,7 @@
                                                          Color="Color.Default"
                                                          ToggledIcon="@Icons.Material.Filled.EventSeat"
                                                          ToggledColor="Color.Warning"
-                                                         Disabled="false"
+                                                         Disabled="!IsSeatAvailable(seat.SeatNumber)"
                                                          Class="@seatClassName" />
                                 }
                             }
@@ -133,6 +134,7 @@
 
 @code {
     private bool drawerOpen = true; // Controls drawer visibility
+    private List<SeatsOutputDTO> availableSeats = new List<SeatsOutputDTO>();
     private List<SeatTemplate> selectedSeats = new(); // Stores selected seats
     private int flightNo { get; set; }
     private Airplane airplane { get; set; }
@@ -157,6 +159,7 @@
 
         if (airplaneSpecs?.Seats != null)
         {
+            availableSeats = compoundService.GetAvailableSeats(flightNo);
             seats = airplaneSpecs.Seats.OrderBy(s => int.Parse(new string(s.SeatNumber.TakeWhile(char.IsDigit).ToArray()))).ToList();
 
             // Initialize seatStatuses
@@ -246,6 +249,11 @@
         return selectedSeats.Any(s => s.SeatNumber == seatNumber);
     }
 
+    private bool IsSeatAvailable(string seatNumber)
+    {
+        return availableSeats.Any(seat => seat.SeatNumber == seatNumber);
+    }
+
     private void ConfirmSeats()
     {
         SeatSelectionService.SetSelectedSeats(selectedSeats);
@@ -276,6 +284,12 @@
         background-size: cover;
         background-position: center;
         height: 100vh;
+    }
+
+    .unavailable-seat {
+        background-color: #b0bec5; /* Light grey for unavailable seats */
+        cursor: not-allowed; /* Show a "not allowed" cursor */
+        opacity: 0.6; /* Make it look faded */
     }
 
     .carousel-section {

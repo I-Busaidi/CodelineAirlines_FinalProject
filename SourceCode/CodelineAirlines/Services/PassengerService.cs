@@ -84,7 +84,7 @@ namespace CodelineAirlines.Services
 
             if (passenger == null)
             {
-                throw new KeyNotFoundException($"Passenger not found: passport {passport}");
+                Log.Information($"Passenger not found: passport {passport}");
             }
 
             return passenger;

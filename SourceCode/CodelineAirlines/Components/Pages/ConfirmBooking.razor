@@ -107,6 +107,10 @@
     public Models.Flight flight = new Models.Flight();
     public decimal totalPrice = 0;
     public User user = new User();
+    const decimal EconomyClassPercentage = 0.00m; // 0% for Economy
+    const decimal BusinessClassPercentage = 0.05m; // 5% for Business
+    const decimal FirstClassPercentage = 0.10m; // 10% for First Class
+    const decimal SeatSelectionPercentage = 0.03m; // 3% for seat selection
     private string? Token;
     protected override void OnInitialized()
     {
@@ -139,6 +143,15 @@
                         LoyaltyPointsToUse = 0
                     });
                 totalPrice += flight.Cost;
+                if (SeatSelectionService.SelectedSeats[i].Type == "First Class")
+                {
+                    totalPrice += totalPrice * FirstClassPercentage;
+                }
+                else if (SeatSelectionService.SelectedSeats[i].Type == "Business")
+                {
+                    totalPrice += totalPrice * BusinessClassPercentage;
+                }
+                totalPrice += totalPrice * SeatSelectionPercentage;
             }
         }
     }

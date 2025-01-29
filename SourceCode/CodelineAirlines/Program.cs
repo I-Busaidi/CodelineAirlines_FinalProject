@@ -83,7 +83,9 @@ namespace CodelineAirlines
 
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddHttpContextAccessor();
+            
             builder.Services.AddHttpClient<WeatherService>(); // Used for weather forecast.
+            builder.Services.AddHttpClient<AirportAdditionService>();
             builder.Services.AddScoped<SeatSelectionService>();
             builder.Services.AddMudServices();
 
