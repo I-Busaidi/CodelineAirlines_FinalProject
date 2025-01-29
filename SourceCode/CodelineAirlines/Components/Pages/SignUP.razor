@@ -28,7 +28,7 @@
                       Label="Password"
                       InputType="InputType.Password"
                       Required="true"
-                      HelperText="Password must be at least 6 characters long"
+                      HelperText="Password must be at least 8 characters long, contains letters and numbers"
                       Validation="new Func<string, string>(ValidatePassword)"/>
         <MudTextField @bind-Value="confirmPassword"
                       Label="Confirm Password"
@@ -101,8 +101,8 @@
 
     private string ValidatePassword(string value)
     {
-        return string.IsNullOrWhiteSpace(value) || value.Length < 6
-            ? "Password must be at least 6 characters long."
+        return string.IsNullOrWhiteSpace(value) || value.Length < 8
+            ? "Password must be at least 8 characters long, contains numbers and letters"
             : null;
     }
 

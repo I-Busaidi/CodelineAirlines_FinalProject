@@ -7,7 +7,7 @@
 <PageTitle>Home</PageTitle>
 <!-- Carousel Section -->
 <MudContainer Class="carousel-container">
-    <MudCarousel Class="mud-carousel" Style="height:500px; width: 100vw; " TData="object">
+    <MudCarousel Class="mud-carousel" AutoCycle="true" AutoCycleTime="TimeSpan.FromMilliseconds(2000)" Style="height:500px; width: 100vw; " TData="object">
         <MudCarouselItem Transition="@Transition.Fade" Color="@Color.Primary">
             <MudImage Src="/Images/LandscapePic1.jpg" Class="carousel-image" />
             <div class="text-overlay">
@@ -166,7 +166,7 @@
                     <MudText Typo="Typo.h6">@route</MudText>
                     <MudText Typo="Typo.body2">@flight.ScheduledDepartureDate.ToString("dd / MM / yyyy")</MudText>
                     <MudText Typo="Typo.h6">From OMR @flight.Cost</MudText>
-                    <MudButton Color="Color.Info" >Book now</MudButton>
+                    <MudButton Color="Color.Info" OnClick="@(() => OnBookButtonClick(flight.FlightNo))">Book now</MudButton>
                 </MudCardContent>
             </MudCard>
             if (count == 4)
@@ -252,7 +252,10 @@
         flights = flightService.GetAllFlights();
     }
 
-
+    private void OnBookButtonClick(int flightNo)
+    {
+        navManager.NavigateTo($"/book-flight/{flightNo.ToString()}");
+    }
 
     private void FindFlights()
     {

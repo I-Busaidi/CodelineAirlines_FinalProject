@@ -16,7 +16,7 @@ namespace CodelineAirlines.DTOs.UserDTOs
         [StringLength(20)]
         public string UserPhoneNumber { get; set; }
 
-        [Required( ErrorMessage = "Email is required.")]
+        [Required( ErrorMessage = "Password is required.")]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must be at least 8 characters long, with at least one letter and one number.")]
         public string Password { get; set; }
 
