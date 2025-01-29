@@ -77,14 +77,8 @@
         <MudItem xs="12" sm="4">
             <MudCard Class="dashboard-card">
                 <MudCardContent>
-                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">
-                        Flights
-                    </MudText>
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Default"
-                               OnClick="NavigateToManageFlights"
-                               FullWidth="true"
-                               Class="card-button">
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="card-title">Flights</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="NavigateToManageFlights" FullWidth="true" Class="card-button">
                         Manage Flights
                     </MudButton>
                 </MudCardContent>
@@ -96,17 +90,17 @@
 @code {
     private void NavigateToManageAirports()
     {
-        NavigationManager.NavigateTo("/AirportManagement");
+        NavigationManager.NavigateTo("/AirportManagement"); // Replace with your actual route for managing airports
     }
 
     private void NavigateToManageAirplanes()
     {
-        NavigationManager.NavigateTo("/manageAirplanes");
+        NavigationManager.NavigateTo("/manageAirplanes"); // Replace with your actual route for managing airplanes
     }
 
     private void NavigateToManageFlights()
     {
-        NavigationManager.NavigateTo("/ViewFlightToAdmin");
+        NavigationManager.NavigateTo("/ViewFlightToAdmin"); // Replace with your actual route for managing flights
     }
 }
 
@@ -254,9 +248,15 @@
 .mt-4 {
     margin-top: 30px !important;
 }
-
+        }
     body {
         margin-top: -64px; /* Adjust if your app bar is pinned at top */
         height: 100vh;
+    .mt-4 {
+</style>
+    }
+
+    .mr-2 {
+        margin-right: 10px;
     }
 </style>

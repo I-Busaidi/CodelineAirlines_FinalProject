@@ -1,0 +1,130 @@
+﻿@page "/signupAdmin"
+@inject NavigationManager NavManager
+@inject IUserService UserService
+@inject IEmailService emailService
+@inject ISmsService smsService
+@attribute [AllowAnonymous]
+<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-6" Style="width: 600px;">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Sign Up</MudText>
+
+    <MudForm @ref="form" Model="@signUpModel" @bind-IsValid="@isValid">
+        <MudTextField @bind-Value="signUpModel.UserName"
+                      Label="Name"
+                      Required="true"
+                      HelperText="Enter your name"
+                      Validation="new Func<string, string>(ValidateRequired)"/>
+        <MudTextField @bind-Value="signUpModel.UserEmail"
+                      Label="Email"
+                      Required="true"
+                      HelperText="Enter a valid email address"
+                      Validation="new Func<string, string>(ValidateRequired)"/>
+        <MudTextField @bind-Value="phoneNumber"
+                      Label="Phone"
+                      InputType="InputType.Telephone"
+                      Required="true"
+                      HelperText="Must be 8 numbers only"
+                      Validation="new Func<string, string>(ValidatePhone)" />
+        <MudTextField @bind-Value="signUpModel.Password"
+                      Label="Password"
+                      InputType="InputType.Password"
+                      Required="true"
+                      HelperText="Password must be at least 6 characters long"
+                      Validation="new Func<string, string>(ValidatePassword)"/>
+        <MudTextField @bind-Value="confirmPassword"
+                      Label="Confirm Password"
+                      InputType="InputType.Password"
+                      Required="true"
+                      HelperText="Re-enter your password to confirm"
+                      Validation="new Func<string, string>(ValidateConfirmPassword)"/>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="Register" Disabled="!isValid" Class="mt-4">
+            Sign Up
+        </MudButton>
+    </MudForm>
+
+    <MudText Typo="Typo.subtitle2" Class="mt-4 text-center">
+        Already have an account? <MudLink Href="/signin">Sign In</MudLink>
+    </MudText>
+</MudContainer>
+
+@code {
+    private UserInputDTOs signUpModel = new();
+    private string confirmPassword;
+    private MudForm form;
+    private bool isValid;
+
+    private string? phoneNumber;
+
+    private void ValidateForm()
+    {
+        form.Validate();
+        if (form.IsValid)
+        {
+            isValid = true;
+        }
+    }
+
+    private async Task Register()
+    {
+
+        if (form.IsValid)
+        {
+            if (signUpModel.Password != confirmPassword)
+            {
+                Console.WriteLine("Passwords do not match!");
+                return;
+            }
+
+            signUpModel.UserRole = "admin";
+            signUpModel.UserPhoneNumber = "+968" + phoneNumber;
+            var result = UserService.Register(signUpModel);
+
+            if (result) // Registration success
+            {
+                string subject = "User Registeration";
+                string message = "You have Been Registered to Codeline Airlines Successfully!";
+                await emailService.SendEmailAsync(signUpModel.UserEmail, subject, message);
+                // await smsService.SendSmsAsync(signUpModel.UserPhoneNumber, message);
+                NavManager.NavigateTo("/signin");
+            }
+            else
+            {
+                Console.WriteLine("Sign-up failed!");
+            }
+        }
+    }
+
+    private string ValidateRequired(string value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "This field is required." : null;
+    }
+
+    private string ValidatePassword(string value)
+    {
+        return string.IsNullOrWhiteSpace(value) || value.Length < 6
+            ? "Password must be at least 6 characters long."
+            : null;
+    }
+
+    private string ValidatePhone(string? value)
+    {
+        if (value == null)
+        {
+            return "Phone number must be 8 numbers.";
+        }
+        if(value.Length != 8)
+        {
+            return "Phone number must be 8 numbers.";
+        }
+        if(!int.TryParse(value, out _))
+        {
+            return "Phone number must contain numbers only";
+        }
+        return null;
+    }
+
+    private string ValidateConfirmPassword(string value)
+    {
+        return value != signUpModel.Password ? "Passwords do not match." : null;
+    }
+}
